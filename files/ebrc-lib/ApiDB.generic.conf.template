@@ -1,0 +1,52 @@
+# $Id$
+# $URL$
+
+<VirtualHost *:80>
+
+# this vh gets its own perl interpreter pool
+PerlOptions  +Parent
+# need a switch here; mod_perl bug?
+PerlSwitches -Mlib
+
+<Perl>
+
+#---------------------------------------------------------------------#
+#   Set $VH::DISABLED to a text message and reload apache             #
+#   to take a site offline.                                           #
+#---------------------------------------------------------------------#
+#$VH::DISABLED = '$VH::ServerName is temporarily offline';
+
+#---------------------------------------------------------------------#
+#   Base configuration for any ApiDB project website                  #
+#---------------------------------------------------------------------#
+require 'conf/lib/ApiCommonWebsite.pm';
+return unless ($VH::ServerName);
+
+require "conf/lib/ReleaseCheck.pm" if (-e "/etc/httpd/conf/lib/ReleaseCheck.pm");
+
+#---------------------------------------------------------------------#
+#   OPTIONAL Project (ApiDB, CryptoDB, etc) specific configuration    #
+#---------------------------------------------------------------------#
+require "conf/lib/${VH::Site}.pm" if (-e "/etc/httpd/conf/lib/${VH::Site}.pm");
+
+</Perl>
+
+#---------------------------------------------------------------------#
+#   Configurations specific to this virtual host, if any, go here     #
+#   either within <Perl> sections or as plain text directives         #
+#---------------------------------------------------------------------#
+
+
+
+
+
+
+
+#---------------------------------------------------------------------#
+#   Final configurations that have to be defined after all others     #
+#---------------------------------------------------------------------#
+<Perl>
+require 'conf/lib/Postscript.pm' if (-e "/etc/httpd/conf/lib/Postscript.pm");
+</Perl>
+
+</VirtualHost>

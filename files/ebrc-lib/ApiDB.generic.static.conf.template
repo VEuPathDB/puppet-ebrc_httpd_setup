@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+
+# this vh gets its own perl interpreter pool
+PerlOptions  +Parent
+# need a switch here; mod_perl bug?
+PerlSwitches -Mlib
+
+<Perl>
+
+#---------------------------------------------------------------------#
+#   Base configuration for any website                                #
+#---------------------------------------------------------------------#
+require 'conf/lib/ApiStaticWebsite.pm';
+
+return unless ($VH::ServerName);
+
+</Perl>
+
+</VirtualHost>
