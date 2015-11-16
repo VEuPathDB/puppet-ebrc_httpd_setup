@@ -46,7 +46,7 @@ the fancy stuff with your module here.
 
 ## Limitations
 
-Assumes RHEL 7 or derivatives. The /etc/system systemd.
+Assumes RHEL 7 or derivatives using systemd.
 
 ## Development
 
