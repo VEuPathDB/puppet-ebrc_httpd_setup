@@ -1,6 +1,3 @@
-# $Id$
-# $URL$
-#
 # Establish the ServerName for a virtual host.
 # For hypothetical 'blah.servername.org', this module expects the following:
 #  - this module be included in blah.servername.org.conf
@@ -12,12 +9,21 @@
 # Otherwise, sets a global package variable $VH::ServerName
 #
 # ApiDB BRC 2008
+# EuPathDB BRC 2017
 
 use Apache2::ServerUtil;
 use Sys::Hostname;
 use File::Basename;
 
-$ServerName   = fileparse($0, '.conf');
+# Handle legacy, pre 10/2017, vhost configurations vs. newer ones using
+# mod_macro templating. Configs using mod_macro define $VH::ConfigFile
+# because $0 is not the invoking script/confg in the macro context.
+# Legacy, non-macro vhost configs don't set $VH::ConfigFile, so set
+# it here.
+if (!defined($VH::ConfigFile)) {
+  $VH::ConfigFile = $0;
+}
+$ServerName   = fileparse($VH::ConfigFile, '.conf');
 $SVR::server_root = Apache2::ServerUtil::server_root();
 $SVR::hostname = Sys::Hostname::hostname();
 
@@ -37,8 +43,8 @@ unless (-l '/var/www/'.$ServerName) {
     } else {
         $s->log_error("$ServerName failure: Symbolic link '/var/www/$ServerName' not found.")
     }
-    $s->log_error("Moving $0 to '$SVR::server_root/conf/disabled_sites/'");
-    system("mv '$0' '$SVR::server_root/conf/disabled_sites/'");
+    $s->log_error("Moving $VH::ConfigFile to '$SVR::server_root/conf/disabled_sites/'");
+    system("mv '$VH::ConfigFile' '$SVR::server_root/conf/disabled_sites/'");
     return 1;
 }
 

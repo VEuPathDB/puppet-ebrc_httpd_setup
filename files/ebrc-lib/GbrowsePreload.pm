@@ -1,6 +1,3 @@
-# $Id$
-# $URL$
-#
 package GbrowsePreload;
 
 #    use ApiCommonWebsite::Model::ModelConfig;

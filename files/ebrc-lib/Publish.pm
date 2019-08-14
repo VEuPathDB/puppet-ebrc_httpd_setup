@@ -33,7 +33,7 @@ sub setAuthUsers {
 #
 sub removePassword {
   $LocationMatch{'^/(?!cgi-bin/admin|dashboard)'} = {
-    Allow => 'from all'
+    Require => 'all granted'
   };
   # Release stage should always be a production level if
   # no password is required. 

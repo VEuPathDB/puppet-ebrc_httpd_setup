@@ -1,6 +1,3 @@
-# $Id$
-# $URL$
-#
 #  ApiDB.org site-specific configurations. Apply to all virual hosts
 #  under /var/www/ApiDB
 

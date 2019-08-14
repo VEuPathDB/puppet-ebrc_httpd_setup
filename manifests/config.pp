@@ -7,6 +7,10 @@ class ebrc_httpd_setup::config (
   $compiled_dir       = '/etc/httpd/conf/compiled',
 ) {
 
+  $manage_enabled_sites = lookup ({
+      "name" => "ebrc_httpd_setup::manage_enabled_sites",
+      "default_value" => true})
+
   include '::apache'
   contain '::ebrc_httpd_setup::website_release_stages'
 
@@ -16,12 +20,18 @@ class ebrc_httpd_setup::config (
   }
 
   file { [
-    $enable_sites_dir,
     $disabled_sites_dir,
     $compiled_dir,
   ]:
     ensure => directory,
     mode   => '0755',
+  }
+
+  if($manage_enabled_sites) {
+    file { $enable_sites_dir:
+      ensure => directory,
+      mode   => '0755',
+    }
   }
 
   Apache::Custom_config {
@@ -45,7 +55,6 @@ class ebrc_httpd_setup::config (
   # PerlSection Perl modules, ToBe moved into an RPM?
   ########################################################################
 
-  ebrc_httpd_setup::libfile { 'ApiCommonWebsite.pm': }
   ebrc_httpd_setup::libfile { 'ApiDB.generic.conf.template': }
   ebrc_httpd_setup::libfile { 'ApiDB.generic.static.conf.template': }
   ebrc_httpd_setup::libfile { 'ApiDB.pm': }
@@ -62,11 +71,14 @@ class ebrc_httpd_setup::config (
   ebrc_httpd_setup::libfile { 'OrthoMCL.pm': }
   ebrc_httpd_setup::libfile { 'Postscript.pm': }
   ebrc_httpd_setup::libfile { 'Publish.pm': }
-  ebrc_httpd_setup::libfile { 'QaAuth.pm': }
   ebrc_httpd_setup::libfile { 'ReleaseCheck.pm': }
   ebrc_httpd_setup::libfile { 'ServerNameInit.pm': }
   ebrc_httpd_setup::libfile { 'ServerStatus.conf': }
   ebrc_httpd_setup::libfile { 'Util.pm': }
+
+  ebrc_httpd_setup::libtmpl { 'QaAuth.pm': }
+  ebrc_httpd_setup::libtmpl { 'ApiCommonWebsite.pm': }
+
   ########################################################################
   # End PerlSection Perl modules, ToBe moved into an RPM?
   ########################################################################

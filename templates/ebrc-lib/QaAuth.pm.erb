@@ -1,0 +1,167 @@
+# This file is managed by Puppet <%= @module_name %>
+$Apache2::PerlSections::Save = 1;
+use Tie::DxHash;
+use Socket qw(inet_ntoa);
+
+tie %LocationMatch, 'Tie::DxHash';
+
+# $VH::ServerName is defined in ApiCommonWebsite.pm
+my $packed_ip = scalar gethostbyname( $VH::ServerName || 'localhost');
+my $server_ip = '127.0.0.1';
+if (defined $packed_ip) {
+    $server_ip = inet_ntoa($packed_ip);
+} else {
+    warn "WARNING: unable to get IP address for '$VH::ServerName'. This virtual host will have authentication problems.";
+}
+
+
+#---------------------------------------------------------------------#
+#          mod_auth_tkt login pages                                   #
+#  (usually only eupathdb.org needs mod_auth_tkt configuration        #
+#   and that uses a static configuration file, so this is             #
+#   mostly for dev/testing)                                           #
+#---------------------------------------------------------------------#
+
+push @ScriptAlias,
+    ['/auth/bin' => "/var/www/Common/mod_auth_tkt/cgi-bin"],
+;
+$Directory{"/var/www/Common/mod_auth_tkt/cgi-bin"} = {
+    AllowOverride   => 'None',
+    Options         => [qw(ExecCGI Includes FollowSymLinks)],
+    SetOutputFilter => 'Includes',
+};
+
+push @Alias,
+    ['/auth' => "/var/www/Common/mod_auth_tkt/html"],
+;
+$Directory{"/var/www/Common/mod_auth_tkt/html"} = {
+    AllowOverride   => 'None',
+    Options         => [qw(FollowSymLinks Includes)],
+};
+
+# Basic Auth required for whole site.
+# I've been unable to figure out how to write RequireAny and RequireAll
+# stanzas as Perl data structures so this part of the configuration is
+# just a big string variable that is pushed on to @PerlConfig.
+# So far this appears to work OK, and is certainly easier to read.
+$VH::QaAuth = qq{
+<LocationMatch '^/'>
+    AuthName '${VH::Site} Restricted'
+    AuthType Basic
+    TKTAuthCookieName 'auth_tkt'
+
+    TKTAuthLoginURL   'https://eupathdb.org/auth/bin/autologin'
+    TKTAuthTimeoutURL 'https://eupathdb.org/auth/bin/autologin?timeout=1'
+    TKTAuthUnauthURL  'https://eupathdb.org/auth/bin/autologin?unauth=1'
+
+    TKTAuthTimeout '2d'
+    TKTAuthIgnoreIP on
+    TKTAuthDebug 1
+    TKTAuthToken 'apidb'
+
+    SetEnvIfExpr "%{REMOTE_ADDR} in { '172.16.30.88', '128.192.75.15', '128.192.75.73' }" is_proxied
+
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.107'"   proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.109'"   proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.108'"   proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.16'"   proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.96'"   proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.211'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.253'"  proxied_internal_client
+
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '127.0.0.0/8'"     localhost
+
+<%- if @is_virtual -%>
+    # non routable (standalone virtual machines)
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '10.0.0.0/8'"      rfc1918
+    # UGA is using 172 for internal routing so don't use on DC servers
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '172.16.0.0/12'"  rfc1918
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '192.168.0.0/16'"  rfc1918
+
+    # On **private** servers (e.g. Vagrant boxes), set
+    # IS_PRIVATE_NETWORK=1 in /etc/sysconfig/httpd and `systemctl
+    # restart httpd.service` (reload is not sufficient) to remove some
+    # restrictions. Do not do this on public-facing servers!
+    SetEnvIfExpr "%{ENV:IS_PRIVATE_NETWORK} == 1" private-network
+<%- end -%>
+
+    # internal clients not going through Nginx
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.107'"   internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.109'"   internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.108'"   internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.16'"   internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.96'"   internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.211'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.253'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.219'"  internal_client
+      
+    SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/\$#"   dashboard
+    SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/xml#"  dashboard_api
+    SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/json#" dashboard_api
+    SetEnvIfExpr "%{HTTP:x-dashboard-security-token} == '\$\{dashboard_security_token\}'" dashboard_token
+
+    <RequireAny>
+      <RequireAll>
+        # /dashboard always requires valid-user.
+        # /dashboard exposes JMX operations and more sensitive data
+        # so is always restricted.
+        Require env dashboard
+        <RequireAny>
+          Require valid-user
+          <%- if @is_virtual -%>
+          Require env private-network
+          <%- end -%>
+        </RequireAny>
+      </RequireAll>
+      <RequireAll>
+        # /dashboard/{xml,json} API requires valid-user unless internal.
+        # The API has limited security exposure, so is more accessible.
+        # This block is redundant with the next block, 'not env
+        # dashboard', but is included to make the point about the API.
+        Require env dashboard_api
+        <RequireAny>
+          Require valid-user
+          Require ip ${server_ip}
+          Require env dashboard_token
+          Require env localhost
+          <%- if @is_virtual -%>
+          Require env rfc1918
+          <%- end -%>
+          Require env internal_client
+          Require env proxied_internal_client
+        </RequireAny>
+      </RequireAll>
+      <RequireAll>
+        # Any request that is not to /dashboard requires
+        # valid-user or origin from approved client IP.
+        Require not env dashboard
+        <RequireAny>
+          Require valid-user
+          Require ip ${server_ip}
+          Require env localhost
+<%- if @is_virtual -%>
+          Require env rfc1918
+<%- end -%>
+          Require env internal_client
+          Require env proxied_internal_client
+        </RequireAny>
+      </RequireAll>
+    </RequireAny>
+
+</LocationMatch>
+
+<LocationMatch '/robots.txt'>
+  Require all granted
+</LocationMatch>
+
+<LocationMatch '/auth/bin/'>
+  Require all granted
+</LocationMatch>
+
+<LocationMatch '/auth/'>
+  Require all granted
+</LocationMatch>
+};
+push @PerlConfig, $VH::QaAuth;
+
+1;

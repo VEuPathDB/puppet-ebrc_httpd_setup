@@ -4,7 +4,7 @@
 #---------------------------------------------------------------------#
 #          /workshop                                                  #
 #---------------------------------------------------------------------#
-push @Alias, 
+push @Alias,
     ['/workshop' => "/var/www/EuPathDB/Common/html/workshops"],
     ['/workshops' => "/var/www/EuPathDB/Common/html/workshops"],
 ;
@@ -25,11 +25,14 @@ push @RewriteRule,
    [ '/apps/SynView(.*)', '/common/SynView$1', '[P]'];
 
 # UniProtKB links to portal, portal redirects to component.
-# http://eupathdb.org/PlasmoDB/gene/PF11_0344 -> http://plasmodb.org/gene/PF11_0344
+# http://eupathdb.org/gene/PlasmoDB:PF11_0344 -> http://plasmodb.org/gene/PF11_0344
 # (^/gene/.+ is itself a RewriteRule in the component sites)
-# Established per December 12, 2009 email "Forwarding eupathdb gene pages to component sites"
+# Established per December 12, 2009 email "Forwarding eupathdb gene
+# pages to component sites" and subsequent discussions.
+# This rewrite must come before the '/gene/PF11_0344' rewrite rule
+# defined in ApiCommonWebsite.pm.
 push @RewriteMap, [ 'lowercase', 'int:tolower' ];
-push @RewriteRule, 
-    [ '^/(.+)/(gene/.+)$',  'http://${lowercase:$1}.org/$2', '[R,L,QSA,NE]' ];
+unshift @RewriteRule,
+    [ '^/gene/([^:]+):(.+)$',  'http://${lowercase:$1}.org/gene/$2', '[R,L,QSA,NE]' ];
 
 1; # return 1 required

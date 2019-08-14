@@ -1,6 +1,3 @@
-# $Id$
-# $URL$
-
 sub getTomcatProps {
     my ($workerprop) = @_;
     my $TC_PROPS = {};

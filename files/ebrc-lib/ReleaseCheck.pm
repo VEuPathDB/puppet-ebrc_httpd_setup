@@ -6,9 +6,12 @@
 #   /var/www/w1.tritrypdb.org -> TriTrypDB/tritrypdb1.0/
 # Display a message.
 #
-# $Id$
-# $URL$
+# /.well-known/acme-challenge is always open for Let's Encrypt
+# certbot.
 #
+
+# skip if this is a 'w' vhost config.
+return if ( $VH::ServerName =~ /^w\d+\./ );
 
 my $wDir = '/var/www';
 my ($domain) = $VH::ServerName =~ m/^.+\.([^\.]+\.[^\.]+)/;
@@ -22,7 +25,7 @@ closedir DIR;
 my @w = map { readlink($wDir . '/' . $_) } @wl;
 
 if ($thisSiteDir && (grep { /$thisSiteDir/ } @w)) {
-  push @Redirect, ['404', '/'];
+  push @RedirectMatch, ['404', '^/(?!.well-known/acme-challenge).*$'];
   # the nobounce query_string informs the live site not to
   # bounce back to beta (see live site configuation)
   push @ErrorDocument, qq(404 "This site has been officially released. \

@@ -1,52 +1,70 @@
-# $Id$
-# $URL$
+<Macro CoreConfig>
+  <Perl>
+  #---------------------------------------------------------------------#
+  #   Set $VH::DISABLED to a text message and reload apache             #
+  #   to take a site offline.                                           #
+  #---------------------------------------------------------------------#
+  #$VH::DISABLED = '$VH::ServerName is temporarily offline';
+
+  #---------------------------------------------------------------------#
+  #   Base configuration for any ApiDB project website                  #
+  #---------------------------------------------------------------------#
+  require 'conf/lib/ApiCommonWebsite.pm';
+  return unless ($VH::ServerName);
+
+  require "conf/lib/ReleaseCheck.pm" if (-e "/etc/httpd/conf/lib/ReleaseCheck.pm");
+
+  #---------------------------------------------------------------------#
+  #   OPTIONAL Project (ApiDB, CryptoDB, etc) specific configuration    #
+  #---------------------------------------------------------------------#
+  require "conf/lib/${VH::Site}.pm" if (-e "/etc/httpd/conf/lib/${VH::Site}.pm");
+  </Perl>
+
+
+  #---------------------------------------------------------------------#
+  #   Configurations specific to this virtual host, if any, go here     #
+  #   either within <Perl> sections or as plain text directives         #
+  #---------------------------------------------------------------------#
+
+  #<Perl/>
+
+  #---------------------------------------------------------------------#
+  #   Final configurations that have to be defined after all others     #
+  #---------------------------------------------------------------------#
+  <Perl>
+  require 'conf/lib/Postscript.pm' if (-e "/etc/httpd/conf/lib/Postscript.pm");
+  </Perl>
+</Macro>
+
+<Macro _PerlSettings>
+  # this vh gets its own perl interpreter pool
+  PerlOptions  +Parent
+  # need a switch here; mod_perl bug?
+  PerlSwitches -Mlib
+</Macro>
 
 <VirtualHost *:80>
-
-# this vh gets its own perl interpreter pool
-PerlOptions  +Parent
-# need a switch here; mod_perl bug?
-PerlSwitches -Mlib
-
-<Perl>
-
-#---------------------------------------------------------------------#
-#   Set $VH::DISABLED to a text message and reload apache             #
-#   to take a site offline.                                           #
-#---------------------------------------------------------------------#
-#$VH::DISABLED = '$VH::ServerName is temporarily offline';
-
-#---------------------------------------------------------------------#
-#   Base configuration for any ApiDB project website                  #
-#---------------------------------------------------------------------#
-require 'conf/lib/ApiCommonWebsite.pm';
-return unless ($VH::ServerName);
-
-require "conf/lib/ReleaseCheck.pm" if (-e "/etc/httpd/conf/lib/ReleaseCheck.pm");
-
-#---------------------------------------------------------------------#
-#   OPTIONAL Project (ApiDB, CryptoDB, etc) specific configuration    #
-#---------------------------------------------------------------------#
-require "conf/lib/${VH::Site}.pm" if (-e "/etc/httpd/conf/lib/${VH::Site}.pm");
-
-</Perl>
-
-#---------------------------------------------------------------------#
-#   Configurations specific to this virtual host, if any, go here     #
-#   either within <Perl> sections or as plain text directives         #
-#---------------------------------------------------------------------#
-
-
-
-
-
-
-
-#---------------------------------------------------------------------#
-#   Final configurations that have to be defined after all others     #
-#---------------------------------------------------------------------#
-<Perl>
-require 'conf/lib/Postscript.pm' if (-e "/etc/httpd/conf/lib/Postscript.pm");
-</Perl>
-
+  Use _PerlSettings
+  <Perl>
+    # $0 is current the Perl script, a.k.a. this Apache config file. $0
+    # loses meaning in the context of <Macro> so this is not included in
+    # the CoreConfig macro. $VH::ConfigFile is used by ServerNameInit.pm.
+    $VH::ConfigFile = $0;
+  </Perl>
+  Use CoreConfig
+  <Perl>
+  $Redirect = "permanent / https://${VH::ServerName}/"
+  </Perl>
 </VirtualHost>
+
+<VirtualHost *:443>
+  Use _PerlSettings
+  <Perl>
+    $VH::ConfigFile = $0;
+  </Perl>
+  Use CoreConfig
+</VirtualHost>
+
+# undefine macros before redefining in other configs
+UndefMacro _PerlSettings
+UndefMacro CoreConfig

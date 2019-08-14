@@ -50,21 +50,6 @@ EnableSendfile <%= @sendfile %>
 AllowEncodedSlashes <%= @allow_encoded_slashes %>
 <%- end -%>
 
-#Listen 80
-
-<% if @apxs_workaround -%>
-# Workaround: without this hack apxs would be confused about where to put
-# LoadModule directives and fail entire procedure of apache package
-# installation/reinstallation. This problem was observed on FreeBSD (apache22).
-#LoadModule fake_module libexec/apache22/mod_fake.so
-<% end -%>
-
-Include "<%= @mod_load_dir %>/*.load"
-<% if @mod_load_dir != @confd_dir and @mod_load_dir != @vhost_load_dir -%>
-Include "<%= @mod_load_dir %>/*.conf"
-<% end -%>
-Include "<%= @ports_file %>"
-
 <% unless @log_formats.has_key?('combined') -%>
 LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
 <% end -%>
@@ -81,19 +66,6 @@ LogFormat "%{User-agent}i" agent
   <%- @log_formats.sort.each do |nickname,format| -%>
 LogFormat "<%= format -%>" <%= nickname %>
   <%- end -%>
-<% end -%>
-
-<%- if scope.function_versioncmp([@apache_version, '2.4']) >= 0 -%>
-IncludeOptional "<%= @confd_dir %>/*.conf"
-<%- else -%>
-Include "<%= @confd_dir %>/*.conf"
-<%- end -%>
-<% if @vhost_load_dir != @confd_dir -%>
-<%- if scope.function_versioncmp([@apache_version, '2.4']) >= 0 -%>
-IncludeOptional "<%= @vhost_load_dir %>/*"
-<%- else -%>
-Include "<%= @vhost_load_dir %>/*"
-<%- end -%>
 <% end -%>
 
 <% if @error_documents -%>
@@ -132,4 +104,53 @@ ErrorDocument 501 /error/HTTP_NOT_IMPLEMENTED.html.var
 ErrorDocument 502 /error/HTTP_BAD_GATEWAY.html.var
 ErrorDocument 503 /error/HTTP_SERVICE_UNAVAILABLE.html.var
 ErrorDocument 506 /error/HTTP_VARIANT_ALSO_VARIES.html.var
+<% end -%>
+
+Include "<%= @mod_load_dir %>/*.load"
+<% if @mod_load_dir != @confd_dir and @mod_load_dir != @vhost_load_dir -%>
+Include "<%= @mod_load_dir %>/*.conf"
+<% end -%>
+Include "<%= @ports_file %>"
+
+<VirtualHost *:80>
+  ServerName default
+  ServerAdmin root@localhost
+  ServerSignature Off
+  DocumentRoot "/var/www/html"
+  <Directory "/var/www/html">
+    AllowOverride None
+    Require all granted
+  </Directory>
+  ErrorLog "/var/log/httpd/default_error.log"
+  CustomLog "/var/log/httpd/access_log" combined
+</VirtualHost>
+
+<VirtualHost *:443>
+  ServerName default
+  ServerAdmin root@localhost
+  ServerSignature Off
+  SSLEngine on
+  SSLCertificateFile    "/etc/pki/tls/certs/localhost.crt"
+  SSLCertificateKeyFile "/etc/pki/tls/private/localhost.key"
+  SSLCACertificatePath  "/etc/pki/tls/certs"
+  DocumentRoot "/var/www/html"
+  <Directory "/var/www/html">
+    AllowOverride None
+    Require all granted
+  </Directory>
+  ErrorLog "/var/log/httpd/ssl_error_log"
+  CustomLog "/var/log/httpd/ssl_access_log" combined
+</VirtualHost>
+
+<%- if scope.function_versioncmp([@apache_version, '2.4']) >= 0 -%>
+IncludeOptional "<%= @confd_dir %>/*.conf"
+<%- else -%>
+Include "<%= @confd_dir %>/*.conf"
+<%- end -%>
+<% if @vhost_load_dir != @confd_dir -%>
+<%- if scope.function_versioncmp([@apache_version, '2.4']) >= 0 -%>
+IncludeOptional "<%= @vhost_load_dir %>/*"
+<%- else -%>
+Include "<%= @vhost_load_dir %>/*"
+<%- end -%>
 <% end -%>

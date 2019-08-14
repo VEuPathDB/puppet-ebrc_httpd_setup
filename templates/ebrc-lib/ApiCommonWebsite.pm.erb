@@ -1,12 +1,11 @@
 #!/usr/bin/perl
 
-# $Id$
-# $URL$
+# This file is managed by Puppet <%= @module_name %>
 #
-# Common configuration for any WDK-based project website. 
-# This module is 'required' by 
+# Common configuration for any WDK-based project website.
+# This module is 'required' by
 # individual virtual host configurations.
-# This file should be server neutral - usable on any machine. 
+# This file should be server neutral - usable on any machine.
 
 use Apache2::Module;
 
@@ -16,8 +15,16 @@ BEGIN {
 
 return 1 unless ($VH::ServerName);
 
-($VH::Webapp, $VH::Site) = fileparse(readlink('/var/www/'. $VH::ServerName));
- $VH::Site =~ s/\/$//;
+my $s = Apache2::PerlSections->server();
+
+($VH::_webappLinkRef, $VH::_siteLinkRef) = fileparse(readlink('/var/www/'. $VH::ServerName));
+if ( ! defined $VH::Webapp) {
+  $VH::Webapp = $VH::_webappLinkRef;
+}
+if ( ! defined $VH::Site) {
+  $VH::Site = $VH::_siteLinkRef;
+}
+$VH::Site =~ s/\/$//;
 ($VH::WebappNoVer) = $VH::Webapp =~ m/(^[a-zA-Z_]+)/;
 
 if (defined $VH::DISABLED) {
@@ -31,12 +38,11 @@ if (defined $VH::DISABLED) {
 #---------------------------------------------------------------------#
 #        PASSWORD PROTECTION AND OTHER ACCESS CONTROLS                #
 #---------------------------------------------------------------------#
-        
+
 require 'conf/lib/QaAuth.pm';
 
 $Location{'/WEB-INF/'} = {
-  Deny    => 'from all',
-  Satisfy => 'all',
+  Require => 'all denied',
 };
 
 
@@ -44,12 +50,12 @@ $Location{'/WEB-INF/'} = {
 #          SAFARI SEMICOLON/AUTH WORKAROUND                           #
 #---------------------------------------------------------------------#
 # Safari does not send Authorization header for request URIs that contain
-# a semicolon - such as Struts <c:url> modified urls that contain 
+# a semicolon - such as Struts <c:url> modified urls that contain
 # ;jsessionid. Encoding ';' as '%3B' works around this.
 ## should investigate using the lower overhead mod_line_edit instead
-#push @ExtFilterDefine, q(encode_semicolon 
-#                         mode=output 
-#                         intype=text/html 
+#push @ExtFilterDefine, q(encode_semicolon
+#                         mode=output
+#                         intype=text/html
 #                         cmd="/bin/sed s/;jsessionid=/%3Bjsessionid=/g"
 #                        );
 
@@ -57,7 +63,7 @@ push @SetEnv, [[ 'LineEdit' => 'text/html' ]];
 push @LERewriteRule, q(;jsessionid= %3Bjsessionid=);
 
 $Location{"/$VH::Webapp"} = {
-    #SetOutputFilter => 'encode_semicolon',  
+    #SetOutputFilter => 'encode_semicolon',
     SetOutputFilter => 'line-editor',
 };
 
@@ -72,10 +78,10 @@ use lib "/var/www/$VH::ServerName/gus_home/lib/perl";
 #---------------------------------------------------------------------#
 #          Update ENV (for cgi)                                       #
 #---------------------------------------------------------------------#
-push @SetEnv, [ 
-    [ 'GUS_HOME' => "/var/www/$VH::ServerName/gus_home" ], 
-    [ 'PERL5LIB' => "/var/www/$VH::ServerName/cgi-lib:/var/www/$VH::ServerName/cgi-lib/gb2:/var/www/$VH::ServerName/gus_home/lib/perl" ], 
-    [ 'PROJECT_ID'=> $VH::Site ], 
+push @SetEnv, [
+    [ 'GUS_HOME' => "/var/www/$VH::ServerName/gus_home" ],
+    [ 'PERL5LIB' => "/var/www/$VH::ServerName/cgi-lib:/var/www/$VH::ServerName/gus_home/lib/perl" ],
+    [ 'PROJECT_ID'=> $VH::Site ],
 ];
 
 #---------------------------------------------------------------------#
@@ -84,27 +90,63 @@ push @SetEnv, [
 
 if (Apache2::Module::loaded('mod_fcgid.c')) {
   push @FcgidInitialEnv,
-    "ORACLE_HOME	/u01/app/oracle/product/11.2.0.3/db_1",
-    "PERL5LIB /var/www/$VH::ServerName/cgi-lib:/var/www/$VH::ServerName/cgi-lib/gb2:/var/www/$VH::ServerName/gus_home/lib/perl",
-    "GBROWSE_CONF /var/www/$VH::ServerName/gus_home/lib/gbrowse/",
-    "GUS_HOME /var/www/$VH::ServerName/gus_home",
-    "PROJECT_ID $VH::Site",
+    "ORACLE_HOME     <%= scope.lookupvar('ebrc_httpd_setup::oracle_home') %>",
+    "LD_LIBRARY_PATH <%= scope.lookupvar('ebrc_httpd_setup::oracle_home') %>/lib",
+    "PERL5LIB        /var/www/$VH::ServerName/cgi-lib:/var/www/$VH::ServerName/gus_home/lib/perl",
+    "GBROWSE_CONF    /var/www/$VH::ServerName/gus_home/lib/gbrowse/",
+    "GUS_HOME        /var/www/$VH::ServerName/gus_home",
+    "PROJECT_ID      $VH::Site",
   ;
-  $FcgidMinProcessesPerClass  =  0;
-  $FcgidMaxProcessesPerClass  =  5;
-  $FcgidIdleTimeout           =  60;
-  $FcgidProcessLifeTime       =  ($FcgidIdleTimeout * 2);
+  $FcgidMinProcessesPerClass  =   1;
+  $FcgidMaxProcessesPerClass  =  10;
+  $FcgidMaxRequestsPerProcess = 500;
+  $FcgidIdleTimeout           = 600;
+  $FcgidProcessLifeTime       = ($FcgidIdleTimeout * 2);
 };
+
+#---------------------------------------------------------------------#
+#         Proxy to Shiny Server, with websocket support               #
+#---------------------------------------------------------------------#
+$VH::shiny_server_port = '3838';
+$VH::shiny_server_path = 'shiny';
+$RewriteEngine = on;
+push @RewriteRule, [
+  "^/${VH::shiny_server_path}\$",
+  "/${VH::shiny_server_path}/",
+  '[R]'
+  ];
+$ProxyPreserveHost = "On";
+push @ProxyPassMatch,
+  [
+    "/${VH::shiny_server_path}/(.*)/__sockjs__/(.+)/(websocket|.*/websocket)\$",
+    "ws://localhost:${VH::shiny_server_port}/\$1/__sockjs__/\$2/\$3/"
+  ],
+;
+push @ProxyPass,
+  [
+    "/${VH::shiny_server_path}/",
+    "http://127.0.0.1:${VH::shiny_server_port}/"
+  ],
+;
+# Shiny Server does not include the hostname in the Location header for
+# redirects so we would need to use "ProxyPassReverse /shiny/  /",
+# except the generic '/' path tangles with other proxypasses (redmine
+# #23418). Setting ProxyPassReverse within a Location seems to satisfy
+# everyone.
+$Location{'/shiny/'} = {
+  ProxyPassReverse => "/",
+};
+
 
 #---------------------------------------------------------------------#
 #         Misc                                                        #
 #---------------------------------------------------------------------#
 $DocumentRoot   = "/var/www/$VH::ServerName/html";
-$DirectoryIndex = "home.jsp index.html index.shtml index.jsp index.php";    
-$ServerAdmin    = 'mheiges@uga.edu';
-push @ErrorDocument, 
+$DirectoryIndex = "home.jsp index.html index.shtml index.jsp index.php";
+$ServerAdmin    = 'opsalert@apidb.org';
+push @ErrorDocument,
                      "401 'The page or file can not be viewed without the correct username/password.'",
-                     "404 /404.shtml", 
+                     "404 /404.shtml",
                      "500 /500.shtml",
                      "503 /500.shtml",
 ;
@@ -113,8 +155,8 @@ push @ErrorDocument,
 # Keep the hard limit higher than soft limit, otherwise processes get SIGKILL'd
 # instead of a trappable SIGXCPU.
 $RLimitCPU = "43200 46800";
-# gbrowse is known to sometimes need up to 2 GB.
-$RLimitMEM = "2147483648 2147483648";  
+# gbrowse is known to sometimes need up to 2 GB, clustalo over 4GB (redmine #26787).
+$RLimitMEM = "8589934592 8589934592";
 
 push @Include, [ qw(conf/lib/MimeTypes.conf) ];
 
@@ -123,25 +165,37 @@ push @Include, [ qw(conf/lib/MimeTypes.conf) ];
 #---------------------------------------------------------------------#
 $RewriteEngine = on;
 
-push @RewriteRule, 
+push @RewriteRule,
     [ '^/$',  "/$VH::Webapp/", '[R]' ],
-    [ '^/siteinfo/xml$', "/siteinfo/index-xml.php", '[P,L,QSA]'],
-    [ '^/siteinfo/xml/(.*)', "/siteinfo/index-xml.php/\$1", '[P,L,QSA]'],
-    [ '^/gene/(.+)',  "/$VH::Webapp/showRecord.do?name=GeneRecordClasses.GeneRecordClass&primary_key=\$1", '[R,L]' ],
+    # redmine #21743
+    [ '^/gene/([^\/]+)$', "/$VH::Webapp/app/record/gene/$1\$1", '[R,L]' ],
+    # redmine #22499
+    [ '^/(gene|genome)/([^\/]+)/comment/([^\/]+)$', "/$VH::Webapp/showComment.do?stableId=\$2&commentTargetId=\$1#\$3", '[R,NE,L]' ],
+    [ '^/dataset/(.+)', "/$VH::Webapp/app/search/dataset/DatasetsById/result?dataset_id=\$1", '[R,L]' ],
 ;
 
 # provide uniformly named access to static files (js, css, etc) served by Tomcat
 $ProxyPreserveHost = "On";
-push @ProxyPass,
-    [ "/webservices http://$VH::ServerName/$VH::Webapp/webservices" ],
-    [ "/a http://$VH::ServerName/$VH::Webapp" ],
-;
-push @ProxyPassReverse,
-    [ "/webservices http://$VH::ServerName/$VH::Webapp/webservices" ],
-    [ "/a http://$VH::ServerName/$VH::Webapp" ],
-;
-
-push @Alias, ['/favicon.ico' => "/var/www/$VH::ServerName/html/assets/images/$VH::Site/favicon.ico"];
+if ($s->port() == '443') {
+  $SSLProxyEngine = 'on';
+  push @ProxyPass,
+      [ "/webservices https://$VH::ServerName/$VH::Webapp/webservices" ],
+      [ "/a https://$VH::ServerName/$VH::Webapp" ],
+  ;
+  push @ProxyPassReverse,
+      [ "/webservices https://$VH::ServerName/$VH::Webapp/webservices" ],
+      [ "/a https://$VH::ServerName/$VH::Webapp" ],
+  ;
+} else {
+  push @ProxyPass,
+      [ "/webservices http://$VH::ServerName/$VH::Webapp/webservices" ],
+      [ "/a http://$VH::ServerName/$VH::Webapp" ],
+  ;
+  push @ProxyPassReverse,
+      [ "/webservices http://$VH::ServerName/$VH::Webapp/webservices" ],
+      [ "/a http://$VH::ServerName/$VH::Webapp" ],
+  ;
+}
 
 #---------------------------------------------------------------------#
 #          Tomcat Connector                                           #
@@ -155,6 +209,16 @@ push @Alias, ['/favicon.ico' => "/var/www/$VH::ServerName/html/assets/images/$VH
 
 push @JkEnvVar, qw(SERVER_ADDR HTTP_ACCEPT_ENCODING);
 
+# tomcat webapp-related env vars for /dashboard
+push @SetEnv, [
+    [ 'TOMCAT_INSTANCE' => $VH::Site ],
+    [ 'CONTEXT_PATH' => "/$VH::Webapp" ],
+];
+
+#---------------------------------------------------------------------#
+#   Redirects from non-canonical path to specifically-named webapp    #
+#---------------------------------------------------------------------#
+
 # convert non-versioned webapp paths to versioned paths
 # e.g. http://dev1.apidb.org/apidb/ -> http://dev1.apidb.org/apidb2.1/
 # This allows hard-coded live site urls to work in the dev site.
@@ -164,28 +228,22 @@ if ($VH::WebappNoVer ne $VH::Webapp) {
   # request to GET, which it does with a standard 302 status.
   push @PerlConfig, qq| RewriteCond %{REQUEST_METHOD} POST |;
   push @PerlConfig, qq| RewriteRule ^/+$VH::WebappNoVer/(.*)\$ /$VH::Webapp/\$1 [R=307,QSA,NE] |;
-  # For GET and HEAD, use 302. In particular, the HtmlUnit WebClient does not follow 307 
+  # For GET and HEAD, use 302. In particular, the HtmlUnit WebClient does not follow 307
   # redirects for HEAD requests.
   push @PerlConfig, qq| RewriteRule ^/+$VH::WebappNoVer/(.*)\$ /$VH::Webapp/\$1 [R=302,QSA,NE] |;
 
   # For the record, this is one way to do a RewriteRule when you don't need an associated RewriteCond.
-  #push @RewriteRule, 
+  #push @RewriteRule,
   #    [ "^/+$VH::WebappNoVer/(.*)\$", "/$VH::Webapp/\$1", '[R,QSA,NE]'],
   #;
 
 }
 
-# env vars for /dashboard
-push @SetEnv, [
-    [ 'TOMCAT_INSTANCE' => $VH::Site ],
-    [ 'CONTEXT_PATH' => "/$VH::Webapp" ],
-];
-
 #---------------------------------------------------------------------#
 #          Website Release Stage                                      #
 #---------------------------------------------------------------------#
 
-push @RewriteRule, 
+push @RewriteRule,
     [ "(.*)/set_website_release_stage_([^/]+)\$", "/\$1", "[R,L,CO=website_release_stage:\$2:%{HTTP_HOST}]"],
 ;
 
@@ -198,7 +256,7 @@ push @SetEnvIfNoCase, [
 ];
 
 # Set default stage if not set earlier.
-# WEBSITE_RELEASE_STAGE_* integer values are defined in /etc/sysconfig/httpd 
+# WEBSITE_RELEASE_STAGE_* integer values are defined in /etc/sysconfig/httpd
 push @SetEnvIf, [
     [
         q(WEBSITE_RELEASE_STAGE),
@@ -222,7 +280,7 @@ $Directory{$DocumentRoot} = {
 #---------------------------------------------------------------------#
 #          /cgi-bin                                                   #
 #---------------------------------------------------------------------#
-push @ScriptAlias, 
+push @ScriptAlias,
     ['/cgi-bin/'  => "/var/www/$VH::ServerName/cgi-bin/"],
     ['/bin/'      => "/var/www/$VH::ServerName/cgi-bin/"],
 ;
@@ -230,8 +288,7 @@ $Directory{"/var/www/$VH::ServerName/cgi-bin"} = {
     AllowOverride   => 'None',
     Options         => [qw(ExecCGI Includes)],
     SetOutputFilter => 'Includes',
-    Order           => 'allow,deny',
-    Allow           => 'from all',
+    Require         => 'all granted',
 };
 
 #---------------------------------------------------------------------#
@@ -239,68 +296,52 @@ $Directory{"/var/www/$VH::ServerName/cgi-bin"} = {
 #---------------------------------------------------------------------#
 
 if (Apache2::Module::loaded('mod_fcgid.c')) {
-  push @ScriptAlias, 
+  push @ScriptAlias,
       ['/fcgi-bin/' => "/var/www/$VH::ServerName/cgi-bin/"],
   ;
-  
+
   $Location{"/fcgi-bin"} = {
       SetHandler      => 'fcgid-script',
       Options         => [qw(ExecCGI Includes)],
       SetOutputFilter => 'Includes',
-      Order           => 'allow,deny',
-      Allow           => 'from all',
+      Require         => 'all granted',
   };
 };
 
 #---------------------------------------------------------------------#
 #      /common/downloads (allow Indexes) - define before /common      #
 #---------------------------------------------------------------------#
-push @Alias, 
+push @Alias,
     ['/common/downloads' => "/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"],
 ;
 $Directory{"/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"} = {
     Options => [qw( Indexes FollowSymLinks Includes MultiViews )],
     IndexOptions => [qw(
         SuppressHTMLPreamble
-        FancyIndexing 
-        FoldersFirst 
+        FancyIndexing
+        FoldersFirst
         IgnoreCase
-        DescriptionWidth=*        
+        DescriptionWidth=*
      )],
      ReadmeName => '/include/fancyIndexFooter.shtml',
      HeaderName => '/include/fancyIndexHeader.shtml',
-     
-     Include => [ qw(conf/lib/DirectoryFileDescriptions.conf) ],
-     IndexIgnore => [qw(.??* *~ *# )],
-     AllowOverride => 'Indexes',
-     Order => 'allow,deny',
-     Allow => 'from all',
 
+     Include => [ qw(conf/lib/DirectoryFileDescriptions.conf) ],
+     IndexIgnore   => [qw(.??* *~ *# )],
+     AllowOverride => 'Indexes',
+     Require       => 'all granted',
+     AddType       => 'application/octet-stream .txt',
 };
 
 #---------------------------------------------------------------------#
-#      /common/community (allow Indexes) - define before /common      #
+#      /common/community                 - define before /common      #
 #---------------------------------------------------------------------#
-push @Alias, 
+push @Alias,
     ['/common/community' => "/var/www/Common/communityFilesMirror"],
 ;
 $Directory{"/var/www/Common/communityFilesMirror"} = {
-    Options => [qw( Indexes FollowSymLinks Includes MultiViews )],
-    IndexOptions => [qw(
-        SuppressHTMLPreamble
-        FancyIndexing 
-        FoldersFirst 
-        IgnoreCase
-        DescriptionWidth=*        
-     )],
-     ReadmeName => '/include/fancyIndexFooter.shtml',
-     HeaderName => '/include/fancyCommunityIndexHeader.shtml',
-     
-     Include => [ qw(conf/lib/DirectoryFileDescriptions.conf) ],
-     IndexIgnore => [qw(.??* *~ *# )],
      AllowOverride => 'None',
-     Order => 'allow,deny',
-     Allow => 'from all',
+     Require       => 'all granted',
 
 };
 
@@ -308,72 +349,51 @@ $Directory{"/var/www/Common/communityFilesMirror"} = {
 #---------------------------------------------------------------------#
 #          /common                                                    #
 #---------------------------------------------------------------------#
-push @Alias, 
+push @Alias,
     ['/common' => "/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"],
 ;
 $Directory{"/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"} = {
     AllowOverride   => 'None',
     Options         => [qw(FollowSymLinks Includes)],
-    Order => 'allow,deny',
-    Allow => 'from all',
+    Require         => 'all granted',
 };
 
 
 #---------------------------------------------------------------------#
 #          /common/cgi-bin                                            #
 #---------------------------------------------------------------------#
-push @ScriptAlias, 
+push @ScriptAlias,
     ['/common-bin' => "/var/www/$VH::Site/Common/cgi-bin"],
 ;
 $Directory{"/var/www/$VH::Site/Common/cgi-bin"} = {
     AllowOverride   => 'None',
     Options         => [qw(ExecCGI Includes)],
     SetOutputFilter => 'Includes',
-    Order => 'allow,deny',
-    Allow => 'from all',
+    Require         => 'all granted',
 };
 
 
 #---------------------------------------------------------------------#
 #           RSS feeds                                                 #
 #---------------------------------------------------------------------#
-push @RewriteRule,   
-    [ '/news.rss'              ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.NewsRss"         ,    '[PT]'   ],                      
-    [ '/events.rss'            ,    "/$VH::Webapp/communityEventsRss.jsp"                                  ,    '[PT]'   ],                      
-    [ '/ebrcpresentations.rss'            ,    "/$VH::Webapp/presentationsRss.jsp"                                  ,    '[PT]'   ],                      
-    [ '/publications.rss'      ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss" ,    '[PT]'   ],                      
-    [ '/releases.rss'          ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.ReleasesRss"     ,    '[PT]'   ],                      
-    [ '/ebrcnews.rss'          ,    "/$VH::Webapp/aggregateNewsRss.jsp"                    ,    '[PT]'   ], 
-    [ '/ebrcevents.rss'        ,    "/$VH::Webapp/communityEventsRss.jsp"                  ,    '[PT]'   ], 
-    [ '/ebrcpublications.rss'  ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss",    '[PT]'   ], 
-    [ '/ebrcreleases.rss'      ,    "/$VH::Webapp/aggregateReleasesRss.jsp"                ,    '[PT]'   ], 
+push @RewriteRule,
+    [ '/news.rss'              ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.NewsRss"         ,    '[PT]'   ],
+    [ '/events.rss'            ,    "/$VH::Webapp/communityEventsRss.jsp"                                  ,    '[PT]'   ],
+    [ '/ebrcpresentations.rss'            ,    "/$VH::Webapp/presentationsRss.jsp"                                  ,    '[PT]'   ],
+    [ '/publications.rss'      ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss" ,    '[PT]'   ],
+    [ '/releases.rss'          ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.ReleasesRss"     ,    '[PT]'   ],
+    [ '/ebrcnews.rss'          ,    "/$VH::Webapp/aggregateNewsRss.jsp"                    ,    '[PT]'   ],
+    [ '/ebrcevents.rss'        ,    "/$VH::Webapp/communityEventsRss.jsp"                  ,    '[PT]'   ],
+    [ '/ebrcpublications.rss'  ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss",    '[PT]'   ],
+    [ '/ebrcreleases.rss'      ,    "/$VH::Webapp/aggregateReleasesRss.jsp"                ,    '[PT]'   ],
 ;
 
 #---------------------------------------------------------------------#
 #          /news redirect                                             #
 #---------------------------------------------------------------------#
-push @RewriteRule, 
+push @RewriteRule,
     [ '^/news', "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.News", '[R]'],
 ;
-
-#---------------------------------------------------------------------#
-#          /icons                                                     #
-#---------------------------------------------------------------------#
-push @Alias, 
-    ['/icons' => "/var/www/icons"],
-;
-$Directory{"/var/www/icons"} = {
-    AllowOverride   => 'None',
-    Options         => [qw(MultiViews Indexes)],
-    Order => 'allow,deny',
-    Allow => 'from all',
-};
-
-#---------------------------------------------------------------------#
-#          /siteinfo                                                  #
-#---------------------------------------------------------------------#
-
-# see QaAuth.pm for /siteinfo
 
 #---------------------------------------------------------------------#
 #          /dashboard                                                 #
@@ -409,25 +429,75 @@ my $mod_log_firstbyte = (-e '/etc/httpd/modules/mod_log_firstbyte.so') ? ' %F' :
 
 push @LogFormat, [
   [  # combined format plus Response Time, plus mod_first_byte time if module is installed
-     qq(\"%h %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\" %D${mod_log_firstbyte}\"),
+     qq(\"%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\" %D${mod_log_firstbyte}\"),
      q(combined+rt)
   ],
 ];
 
-push @CustomLog, [ 
-    [ 
-        qq($log_dir/access_log), 
-        q(combined+rt), 
+push @CustomLog, [
+    [
+        qq($log_dir/access_log),
+        q(combined+rt),
         q(env=!self)
     ],
-    [ 
-        qq($log_dir/self_access_log), 
-        q(combined+rt),  
+    [
+        qq($log_dir/self_access_log),
+        q(combined+rt),
         q(env=self)
     ],
 ];
 
+#---------------------------------------------------------------------#
+#          SSLEngine                                                  #
+#---------------------------------------------------------------------#
+
+if ($s->port() == '443') {
+  $SSLEngine = 'on';
+  $SSLHonorCipherOrder = 'on';
+  $SSLCompression = 'off';
+  # See below for note on SSLProtocol and SSLCipherSuite
+
+  # $SSLCertificate variables set here can not be directly overridden in
+  # the virtual host configuration, so if you must override them use the
+  # following variables in <Perl> sections of the virtual host config.
+  # Certificate directives must be overridden as a complete set
+  #   <Perl>
+  #     $VH::SSLCertificateFile = '/path/cert.pem';
+  #     $VH::SSLCertificateKeyFile = '/path/key.pem';
+  #     (optional) $VH::SSLCertificateChainFile = '/path/chain.pem';
+  #   </Perl>
+  # These must be defined before this module is called.
+  #
+  $VH::wildcard_cert_base = "/etc/acme/apidb.org";
+  if ($VH::SSLCertificateFile) {
+    $SSLCertificateFile = $VH::SSLCertificateFile;
+    $SSLCertificateKeyFile = $VH::SSLCertificateKeyFile;
+    $SSLCertificateChainFile = $VH::SSLCertificateChainFile if ($VH::SSLCertificateChainFile);
+  } elsif (-f "${VH::wildcard_cert_base}/cert.pem" ) {
+    $SSLCertificateFile = "${VH::wildcard_cert_base}/cert.pem";
+    $SSLCertificateKeyFile = "${VH::wildcard_cert_base}/cert.key";
+    $SSLCertificateChainFile = "${VH::wildcard_cert_base}/chain.pem";
+  } else {
+    $SSLCertificateFile = "/etc/pki/tls/certs/localhost.crt";
+    $SSLCertificateKeyFile =  "/etc/pki/tls/private/localhost.key";
+  }
+
+  # We do not set SSLProtocol or SSLCipherSuite here. That's set
+  # in /etc/httpd/conf.d/ssl.conf.
+  # As of httpd 2.4.6, there's a bug such that SSLProtocol is inherited
+  # from the first vhost and can not be overridden in subsequent vhosts
+  # (https://bz.apache.org/bugzilla/show_bug.cgi?id=55707). SSLCipherSuite
+  # can be set per vhost but I can only get that to work by setting static
+  # "SSLCipherSuite ECDHE-ECDSA-..." directives; I have been unable to get
+  # that to work reliably in PerlSections. "$SSLCipherSuite = ... " sort
+  # of works but is prone to failure if the suite string is more than 190
+  # characters. Neither $s->add_config() not 'push @PerlConfig' syntaxes
+  # work for me, I believe also due to the character length limitation
+  # that causes silent failures.
+
+} # if port 443
+
 
 1;
 
-__END__    
+__END__

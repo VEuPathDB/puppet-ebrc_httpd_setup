@@ -1,6 +1,3 @@
-# $Id$
-# $URL$
-#
 # Make temporary dir for gbrowse images; writable by Apache process
 # and the group of the parent gbrowse dir.
 #

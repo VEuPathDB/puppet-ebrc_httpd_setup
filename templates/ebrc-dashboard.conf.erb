@@ -1,0 +1,10 @@
+# This file is managed by Puppet <%= @module_name %>
+# Configurations for /dashboard
+
+<% if @dashboard_security_token %>
+# Token to use for /dashboard API, e.g.
+# curl -H 'x-dashboard-security-token: <%= @dashboard_security_token %>' https://eupathdb.org/dashboard/json
+# This is used with 'SetEnvIf...' directives in vhost configruations.
+#
+Define dashboard_security_token <%= @dashboard_security_token %>
+<% end %>
