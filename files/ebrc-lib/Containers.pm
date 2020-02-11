@@ -1,21 +1,26 @@
-# this function sets proxypass config for local containerized services
+# these functions set proxypass config for local containerized services.  There
+# is a function for each service, as these services may not be applied to every
+# site.
 #
-# It takes an argument for 'stage' which is dev,qa,prod and sets the values
-# accordingly. 
+# They take an argument for 'stage' which is dev,qa,prod and call
+# set_proxy_urls, which sets the values accordingly.  Those values are then
+# used individually by service specific functions to set proxies as required by
+# that service
 #
 # It is used by callers like this:
 #
 # <Perl>
 #   require 'conf/lib/Containers.pm';
-#   set_container_proxies('dev');
+#   set_sitesearch_proxy('dev');
+#   set_mapveu_proxy('dev');
 # </Perl>
 #
-# Note that the first call of this function wins - subsequent calls do not
+# Note that the first call of these functions wins - subsequent calls do not
 # change the proxies
 #
 
 
-sub set_container_proxies {
+sub set_proxy_urls {
 
   my $stage = shift;
   chomp($stage);
@@ -41,10 +46,17 @@ sub set_container_proxies {
   $SSLProxyEngine = 'on';
   $ProxyPreserveHost = 'off';
 
+}
+
 #---------------------------------------------------------------------#
 #        SiteSearch proxy                                             #
 #---------------------------------------------------------------------#
   
+sub set_sitesearch_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
   push @ProxyPass,
       [ "/site-search ${VH::site_search_proxy_url}" ],
   ;
@@ -52,14 +64,19 @@ sub set_container_proxies {
       [ "/site-search ${VH::site_search_proxy_url}" ],
   ;
 
+}
 
 #---------------------------------------------------------------------#
 #        MapVEu proxy                                                 #
 #---------------------------------------------------------------------#
   
+sub set_mapveu_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
   # if there is a directory named 'popbio-map' in html, we assume this vhost is
   # being used to develop the map, and only proxy the solr backends 
-
 
   if (-d '/var/www/'.$VH::ServerName.'/html/popbio-map') {
     push @ProxyPass,
