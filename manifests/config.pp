@@ -59,6 +59,7 @@ class ebrc_httpd_setup::config (
   ebrc_httpd_setup::libfile { 'ApiDB.generic.static.conf.template': }
   ebrc_httpd_setup::libfile { 'ApiDB.pm': }
   ebrc_httpd_setup::libfile { 'ApiStaticWebsite.pm': }
+  ebrc_httpd_setup::libfile { 'Containers.pm': }
   ebrc_httpd_setup::libfile { 'CryptoDB.pm': }
   ebrc_httpd_setup::libfile { 'DashboardStaticAuth.conf': }
   ebrc_httpd_setup::libfile { 'DirectoryFileDescriptions.conf': }
