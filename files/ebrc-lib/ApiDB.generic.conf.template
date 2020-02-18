@@ -18,15 +18,21 @@
   #   OPTIONAL Project (ApiDB, CryptoDB, etc) specific configuration    #
   #---------------------------------------------------------------------#
   require "conf/lib/${VH::Site}.pm" if (-e "/etc/httpd/conf/lib/${VH::Site}.pm");
-  </Perl>
 
+  #---------------------------------------------------------------------#
+  #   Container proxy config                                            #
+  #---------------------------------------------------------------------#
+
+  require 'conf/lib/Containers.pm';
+  set_sitesearch_proxy('dev');
+
+  </Perl>
 
   #---------------------------------------------------------------------#
   #   Configurations specific to this virtual host, if any, go here     #
   #   either within <Perl> sections or as plain text directives         #
   #---------------------------------------------------------------------#
 
-  #<Perl/>
 
   #---------------------------------------------------------------------#
   #   Final configurations that have to be defined after all others     #
