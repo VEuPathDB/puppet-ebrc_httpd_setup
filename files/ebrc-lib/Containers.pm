@@ -30,8 +30,8 @@ sub set_proxy_urls {
 #---------------------------------------------------------------------#
   
   if ($stage eq "dev") {
-      $VH::site_search_proxy_url = "https://site-search.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu.local.apidb.org:8443";
+      $VH::site_search_proxy_url = "https://sitesearch-dev.local.apidb.org:8443";
+      $VH::mapveu_proxy_url      = "https://mapveu-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
