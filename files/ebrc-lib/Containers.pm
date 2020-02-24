@@ -56,7 +56,7 @@ sub set_sitesearch_proxy {
   my $stage = shift;
   set_proxy_urls($stage);
 
-  $Location{"/site-search/"} = {
+  $Location{"/site-search"} = {
      ProxyPreserveHost => 'off',
   };
 
@@ -78,7 +78,7 @@ sub set_mapveu_proxy {
   my $stage = shift;
   set_proxy_urls($stage);
 
-  $Location{"/popbio-map/"} = {
+  $Location{"/popbio-map"} = {
      ProxyPreserveHost => 'off',
   };
 
