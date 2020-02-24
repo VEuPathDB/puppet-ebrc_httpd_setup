@@ -44,7 +44,6 @@ sub set_proxy_urls {
 #---------------------------------------------------------------------#
   
   $SSLProxyEngine = 'on';
-  $ProxyPreserveHost = 'off';
 
 }
 
@@ -56,6 +55,10 @@ sub set_sitesearch_proxy {
 
   my $stage = shift;
   set_proxy_urls($stage);
+
+  $Location{"/site-search/"} = {
+     ProxyPreserveHost => 'off',
+  };
 
   push @ProxyPass,
       [ "/site-search ${VH::site_search_proxy_url}" ],
@@ -74,6 +77,10 @@ sub set_mapveu_proxy {
 
   my $stage = shift;
   set_proxy_urls($stage);
+
+  $Location{"/popbio-map/"} = {
+     ProxyPreserveHost => 'off',
+  };
 
   # if there is a directory named 'popbio-map' in html, we assume this vhost is
   # being used to develop the map, and only proxy the solr backends 
