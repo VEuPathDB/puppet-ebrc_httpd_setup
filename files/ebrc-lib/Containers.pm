@@ -39,6 +39,11 @@ sub set_proxy_urls {
       $VH::mapveu_proxy_url      = "https://mapveu-qa.local.apidb.org:8443";
   }
 
+  if ($stage eq "prod") {
+      $VH::site_search_proxy_url = "https://sitesearch-prod.local.apidb.org:8443";
+      $VH::mapveu_proxy_url      = "https://mapveu-prod.local.apidb.org:8443";
+  }
+
 #---------------------------------------------------------------------#
 #        set for all proxies                                          #
 #---------------------------------------------------------------------#
