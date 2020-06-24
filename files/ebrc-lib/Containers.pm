@@ -32,16 +32,19 @@ sub set_proxy_urls {
   if ($stage eq "dev") {
       $VH::site_search_proxy_url = "https://sitesearch-dev.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-dev.local.apidb.org:8443";
+      $VH::udis_proxy_url        = "https://udis-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
       $VH::site_search_proxy_url = "https://sitesearch-qa.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-qa.local.apidb.org:8443";
+      $VH::udis_proxy_url        = "https://udis-qa.local.apidb.org:8443";
   }
 
   if ($stage eq "prod") {
       $VH::site_search_proxy_url = "https://sitesearch-prod.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-prod.local.apidb.org:8443";
+      $VH::udis_proxy_url        = "https://udis-prod.local.apidb.org:8443";
   }
 
 #---------------------------------------------------------------------#
@@ -114,6 +117,28 @@ sub set_mapveu_proxy {
     ;
   }
 
+
+}
+
+#---------------------------------------------------------------------#
+#        User Dataset Import Service (udis) proxy                     #
+#---------------------------------------------------------------------#
+
+sub set_udis_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
+  $Location{"/dataset-import"} = {
+     ProxyPreserveHost => 'off',
+  };
+
+  push @ProxyPass,
+      [ "/dataset-import ${VH::udis_proxy_url}" ],
+  ;
+  push @ProxyPassReverse,
+      [ "/dataset-import ${VH::udis_search_proxy_url}" ],
+  ;
 
 }
 
