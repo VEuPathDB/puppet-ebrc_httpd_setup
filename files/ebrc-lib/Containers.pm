@@ -137,7 +137,7 @@ sub set_udis_proxy {
       [ "/dataset-import ${VH::udis_proxy_url}" ],
   ;
   push @ProxyPassReverse,
-      [ "/dataset-import ${VH::udis_search_proxy_url}" ],
+      [ "/dataset-import ${VH::udis_proxy_url}" ],
   ;
 
 }
