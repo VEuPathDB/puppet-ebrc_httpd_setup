@@ -59,7 +59,7 @@ $VH::QaAuth = qq{
     TKTAuthDebug 1
     TKTAuthToken 'apidb'
 
-    SetEnvIfExpr "%{REMOTE_ADDR} in { '172.16.30.88', '128.192.75.15', '128.192.75.73' }" is_proxied
+    SetEnvIfExpr "%{REMOTE_ADDR} in { '172.16.30.88', '128.192.75.15', '128.192.75.73', '128.192.21.13' }" is_proxied
 
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.107'"   proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.109'"   proxied_internal_client
