@@ -98,6 +98,9 @@ $VH::QaAuth = qq{
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.211'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.253'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.219'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.19'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.22'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.16'"  internal_client
       
     SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/\$#"   dashboard
     SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/xml#"  dashboard_api
