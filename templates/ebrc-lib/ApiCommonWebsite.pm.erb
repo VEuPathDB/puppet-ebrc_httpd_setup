@@ -286,6 +286,7 @@ push @ScriptAlias,
     ['/bin/'      => "/var/www/$VH::ServerName/cgi-bin/"],
 ;
 $Directory{"/var/www/$VH::ServerName/cgi-bin"} = {
+    SetEnv          => [qw(LANG en_US.UTF-8)],
     AllowOverride   => 'None',
     Options         => [qw(ExecCGI Includes)],
     SetOutputFilter => 'Includes',
@@ -367,6 +368,7 @@ push @ScriptAlias,
     ['/common-bin' => "/var/www/$VH::Site/Common/cgi-bin"],
 ;
 $Directory{"/var/www/$VH::Site/Common/cgi-bin"} = {
+    SetEnv          => [qw(LANG en_US.UTF-8)],
     AllowOverride   => 'None',
     Options         => [qw(ExecCGI Includes)],
     SetOutputFilter => 'Includes',
