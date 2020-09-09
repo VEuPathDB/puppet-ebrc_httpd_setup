@@ -104,6 +104,14 @@ $VH::QaAuth = qq{
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.16'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.204'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.54'"  internal_client
+
+    # requests made from local docker containers come from our internal docker
+    # network and need to be allowed through
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch '10.70.0.0/19'"  internal_client
+
+    # on new hardware at Penn (i.e. fir) this comes through the gateway for
+    # internal requests to public natted addresses
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.1'"  internal_client
       
     SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/\$#"   dashboard
     SetEnvIfExpr "%{REQUEST_URI} =~ m#^/dashboard/xml#"  dashboard_api
