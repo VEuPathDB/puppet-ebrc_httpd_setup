@@ -159,10 +159,10 @@ sub set_das_proxy {
   };
 
   push @ProxyPass,
-      [ "/dataset-access ${VH::udis_proxy_url}" ],
+      [ "/dataset-access ${VH::das_proxy_url}" ],
   ;
   push @ProxyPassReverse,
-      [ "/dataset-access ${VH::udis_proxy_url}" ],
+      [ "/dataset-access ${VH::das_proxy_url}" ],
   ;
 
 }
