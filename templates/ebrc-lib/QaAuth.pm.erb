@@ -72,7 +72,9 @@ $VH::QaAuth = qq{
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.19'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.22'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.16'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.51'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.54'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.55'"  proxied_internal_client
 
     SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '127.0.0.0/8'"     localhost
 
@@ -102,8 +104,10 @@ $VH::QaAuth = qq{
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.19'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.22'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.16'"  internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.204'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.54'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.201'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.204'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.205'"  internal_client
 
     # requests made from local docker containers come from our internal docker
     # network and need to be allowed through
