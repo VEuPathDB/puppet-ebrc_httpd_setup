@@ -35,6 +35,7 @@ sub set_proxy_urls {
       $VH::mapveu_proxy_url      = "https://mapveu-dev.local.apidb.org:8443";
       $VH::udis_proxy_url        = "https://udis-dev.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-dev.local.apidb.org:8443";
+      $VH::mblast_proxy_url     = "https://mblast-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
@@ -43,6 +44,7 @@ sub set_proxy_urls {
       $VH::mapveu_proxy_url      = "https://mapveu-qa.local.apidb.org:8443";
       $VH::udis_proxy_url        = "https://udis-qa.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-qa.local.apidb.org:8443";
+      $VH::mblast_proxy_url     = "https://mblast-qa.local.apidb.org:8443";
   }
 
   if ($stage eq "prod") {
@@ -51,6 +53,7 @@ sub set_proxy_urls {
       $VH::mapveu_proxy_url      = "https://mapveu-prod.local.apidb.org:8443";
       $VH::udis_proxy_url        = "https://udis-prod.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-prod.local.apidb.org:8443";
+      $VH::mblast_proxy_url     = "https://mblast-prod.local.apidb.org:8443";
   }
 
 #---------------------------------------------------------------------#
@@ -184,6 +187,28 @@ sub set_das_proxy {
   ;
   push @ProxyPassReverse,
       [ "/dataset-access ${VH::das_proxy_url}" ],
+  ;
+
+}
+
+#---------------------------------------------------------------------#
+#        Multi-blast Service (mblast) proxy                           #
+#---------------------------------------------------------------------#
+
+sub set_mblast_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
+  $Location{"/multi-blast"} = {
+     ProxyPreserveHost => 'off',
+  };
+
+  push @ProxyPass,
+      [ "/multi-blast ${VH::mblast_proxy_url}" ],
+  ;
+  push @ProxyPassReverse,
+      [ "/multi-blast ${VH::mblast_proxy_url}" ],
   ;
 
 }
