@@ -395,7 +395,7 @@ push @RewriteRule,
 #          /news redirect                                             #
 #---------------------------------------------------------------------#
 push @RewriteRule,
-    [ '^/news', "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.News", '[R]'],
+    [ '^/news', "/$VH::Webapp/app/static-content/$VH::Site/news.html", '[R]'],
 ;
 
 #---------------------------------------------------------------------#
