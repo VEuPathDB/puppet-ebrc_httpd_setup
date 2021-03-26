@@ -36,7 +36,7 @@ sub set_proxy_urls {
       $VH::udis_proxy_url        = "https://udis-dev.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-dev.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-dev.local.apidb.org:8443";
-      $VH::eda_proxy_url        = "https://eda-dev.local.apidb.org:8443";
+      $VH::eda_proxy_url        = "https://edadata-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
@@ -46,7 +46,7 @@ sub set_proxy_urls {
       $VH::udis_proxy_url        = "https://udis-qa.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-qa.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-qa.local.apidb.org:8443";
-      $VH::eda_proxy_url        = "https://eda-qa.local.apidb.org:8443";
+      $VH::eda_proxy_url        = "https://edadata-qa.local.apidb.org:8443";
   }
 
   if ($stage eq "prod") {
@@ -56,7 +56,7 @@ sub set_proxy_urls {
       $VH::udis_proxy_url        = "https://udis-prod.local.apidb.org:8443";
       $VH::das_proxy_url        = "https://das-prod.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-prod.local.apidb.org:8443";
-      $VH::eda_proxy_url        = "https://eda-prod.local.apidb.org:8443";
+      $VH::eda_proxy_url        = "https://edadata-prod.local.apidb.org:8443";
   }
 
 #---------------------------------------------------------------------#
