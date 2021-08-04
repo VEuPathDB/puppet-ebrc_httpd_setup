@@ -230,10 +230,10 @@ sub set_eda_proxy {
   };
 
   push @ProxyPass,
-      [ "/eda-data ${VH::eda_proxy_url}" ],
+      [ "/eda-data ${VH::eda_proxy_url} timeout=120" ],
   ;
   push @ProxyPassReverse,
-      [ "/eda-data ${VH::eda_proxy_url}" ],
+      [ "/eda-data ${VH::eda_proxy_url} timeout=120" ],
   ;
 
 }
