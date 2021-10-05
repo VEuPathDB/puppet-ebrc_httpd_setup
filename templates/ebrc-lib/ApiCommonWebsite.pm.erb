@@ -443,11 +443,17 @@ push @CustomLog, [
         q(combined+rt),
         q(env=!self)
     ],
-    [
-        qq($log_dir/self_access_log),
-        q(combined+rt),
-        q(env=self)
-    ],
+#
+# removing self_acess_log, since it is dependent on a hardcoded url above,
+# which won't work in most cases.  The log file also increases the number of
+# open files for apache, which is an issue in dev servers where perlconf sites
+# are more likely to be.
+#
+#    [
+#        qq($log_dir/self_access_log),
+#        q(combined+rt),
+#        q(env=self)
+#    ],
 ];
 
 #---------------------------------------------------------------------#
