@@ -235,6 +235,9 @@ sub set_eda_proxy {
   push @ProxyPassReverse,
       [ "/eda-data ${VH::eda_proxy_url} timeout=120" ],
   ;
+  push @ProxyPassReverseCookiePath,
+      [ "/ /eda-data"],
+  ;
 
 }
 
