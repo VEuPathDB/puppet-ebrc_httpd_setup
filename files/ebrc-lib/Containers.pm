@@ -239,23 +239,6 @@ sub set_eda_proxy {
       [ "/ /eda"],
   ;
 
-  # temporary proxy for eda-data so it will continue to work while we move to
-  # /eda
-
-  $Location{"/eda-data"} = {
-     ProxyPreserveHost => 'off',
-  };
-
-  push @ProxyPass,
-      [ "/eda-data ${VH::eda_proxy_url} timeout=120" ],
-  ;
-  push @ProxyPassReverse,
-      [ "/eda-data ${VH::eda_proxy_url} timeout=120" ],
-  ;
-  push @ProxyPassReverseCookiePath,
-      [ "/ /eda-data"],
-  ;
-
 }
 
 1;
