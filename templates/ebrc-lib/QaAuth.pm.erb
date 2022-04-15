@@ -73,6 +73,7 @@ $VH::QaAuth = qq{
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.22'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.16'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.51'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.52'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.54'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.55'"  proxied_internal_client
 
