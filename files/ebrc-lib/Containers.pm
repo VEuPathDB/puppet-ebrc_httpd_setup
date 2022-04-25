@@ -62,6 +62,17 @@ sub set_proxy_urls {
       $VH::eda_proxy_url        = "https://edadata-prod.local.apidb.org:8443";
   }
 
+  if ($stage eq "feat") {
+      $VH::site_search_proxy_url = "https://sitesearch-feat.local.apidb.org:8443";
+      $VH::orthosearch_proxy_url = "https://orthosearch-feat.local.apidb.org:8443";
+      $VH::edasearch_proxy_url   = "https://edasearch-feat.local.apidb.org:8443";
+      $VH::mapveu_proxy_url      = "https://mapveu-feat.local.apidb.org:8443";
+      $VH::udis_proxy_url        = "https://udis-feat.local.apidb.org:8443";
+      $VH::das_proxy_url        = "https://das-feat.local.apidb.org:8443";
+      $VH::mblast_proxy_url     = "https://mblast-feat.local.apidb.org:8443";
+      $VH::eda_proxy_url        = "https://edadata-feat.local.apidb.org:8443";
+  }
+
 #---------------------------------------------------------------------#
 #        set for all proxies                                          #
 #---------------------------------------------------------------------#
