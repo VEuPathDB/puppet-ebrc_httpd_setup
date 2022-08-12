@@ -38,6 +38,7 @@ sub set_proxy_urls {
       $VH::das_proxy_url        = "https://das-dev.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-dev.local.apidb.org:8443";
       $VH::eda_proxy_url        = "https://edadata-dev.local.apidb.org:8443";
+      $VH::cellxgene_proxy_url   = "https://cellxgene-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
@@ -49,6 +50,7 @@ sub set_proxy_urls {
       $VH::das_proxy_url        = "https://das-qa.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-qa.local.apidb.org:8443";
       $VH::eda_proxy_url        = "https://edadata-qa.local.apidb.org:8443";
+      $VH::cellxgene_proxy_url   = "https://cellxgene-qa.local.apidb.org:8443";
   }
 
   if ($stage eq "prod") {
@@ -60,6 +62,7 @@ sub set_proxy_urls {
       $VH::das_proxy_url        = "https://das-prod.local.apidb.org:8443";
       $VH::mblast_proxy_url     = "https://mblast-prod.local.apidb.org:8443";
       $VH::eda_proxy_url        = "https://edadata-prod.local.apidb.org:8443";
+      $VH::cellxgene_proxy_url   = "https://cellxgene-prod.local.apidb.org:8443";
   }
 
   if ($stage eq "feat") {
@@ -247,7 +250,28 @@ sub set_mblast_proxy {
   ;
 
 }
+#
+#---------------------------------------------------------------------#
+#        cellxgene gateway Service (cellxgene) proxy                  #
+#---------------------------------------------------------------------#
 
+sub set_cellxgene_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
+  $Location{"/cellxgene"} = {
+     ProxyPreserveHost => 'off',
+  };
+
+  push @ProxyPass,
+      [ "/cellxgene ${VH::cellxgene_proxy_url}" ],
+  ;
+  push @ProxyPassReverse,
+      [ "/cellxgene ${VH::cellxgene_proxy_url}" ],
+  ;
+
+}
 #---------------------------------------------------------------------#
 #        Exploratory Data Analysis Service (eda) proxy                #
 #---------------------------------------------------------------------#
