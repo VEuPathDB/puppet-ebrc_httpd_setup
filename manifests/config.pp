@@ -8,8 +8,8 @@ class ebrc_httpd_setup::config (
 ) {
 
   $manage_enabled_sites = lookup ({
-      "name" => "ebrc_httpd_setup::manage_enabled_sites",
-      "default_value" => true})
+      'name' => 'ebrc_httpd_setup::manage_enabled_sites',
+      'default_value' => true})
 
   include '::apache'
   contain '::ebrc_httpd_setup::website_release_stages'
