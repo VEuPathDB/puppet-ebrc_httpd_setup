@@ -24,8 +24,13 @@
   #---------------------------------------------------------------------#
 
   require 'conf/lib/Containers.pm';
-  set_sitesearch_proxy('dev');
+  set_cellxgene_proxy('dev');
+  set_das_proxy('dev');
+  set_eda_proxy('dev');
   set_mblast_proxy('dev');
+  set_seqret_proxy('dev');
+  set_sitesearch_proxy('dev');
+  set_udis_proxy('dev');
 
   </Perl>
 
