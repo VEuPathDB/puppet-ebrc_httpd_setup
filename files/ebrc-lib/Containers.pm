@@ -40,6 +40,7 @@ sub set_proxy_urls {
       $VH::eda_proxy_url         = "https://edadata-dev.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-dev.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-dev.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-dev.local.apidb.org:8443";
   }
 
   if ($stage eq "qa") {
@@ -53,6 +54,7 @@ sub set_proxy_urls {
       $VH::eda_proxy_url         = "https://edadata-qa.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-qa.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-qa.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-qa.local.apidb.org:8443";
   }
 
   if ($stage eq "prod") {
@@ -66,6 +68,7 @@ sub set_proxy_urls {
       $VH::eda_proxy_url         = "https://edadata-prod.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-prod.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-prod.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-prod.local.apidb.org:8443";
   }
 
   if ($stage eq "feat") {
@@ -78,6 +81,7 @@ sub set_proxy_urls {
       $VH::mblast_proxy_url      = "https://mblast-feat.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-feat.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-feat.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-feat.local.apidb.org:8443";
   }
 
   if ($stage eq "alpha") {
@@ -90,6 +94,7 @@ sub set_proxy_urls {
       $VH::mblast_proxy_url      = "https://mblast-alpha.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-alpha.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-alpha.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-alpha.local.apidb.org:8443";
   }
 
   if ($stage eq "beta") {
@@ -102,6 +107,7 @@ sub set_proxy_urls {
       $VH::mblast_proxy_url      = "https://mblast-beta.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-beta.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-beta.local.apidb.org:8443";
+      $VH::vdi_proxy_url         = "https://vdi-beta.local.apidb.org:8443";
   }
 
 #---------------------------------------------------------------------#
@@ -343,6 +349,28 @@ sub set_seqret_proxy {
     ;
     push @ProxyPassReverse,
         [ "/sequence-retrieval ${VH::seqret_proxy_url}" ],
+    ;
+
+}
+
+#---------------------------------------------------------------------#
+#        VEuPathDB Dataset Installer Service (VDI) proxy              #
+#---------------------------------------------------------------------#
+
+sub set_vdi_proxy {
+
+    my $stage = shift;
+    set_proxy_urls($stage);
+
+    $Location{"/vdi"} = {
+       ProxyPreserveHost => 'off',
+    };
+
+    push @ProxyPass,
+        [ "/vdi ${VH::vdi_proxy_url}" ],
+    ;
+    push @ProxyPassReverse,
+        [ "/vdi ${VH::vdi_proxy_url}" ],
     ;
 
 }
