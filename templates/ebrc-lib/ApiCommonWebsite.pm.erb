@@ -105,41 +105,6 @@ if (Apache2::Module::loaded('mod_fcgid.c')) {
 };
 
 #---------------------------------------------------------------------#
-#         Proxy to Shiny Server, with websocket support               #
-#---------------------------------------------------------------------#
-$VH::shiny_server_port = '3838';
-$VH::shiny_server_path = 'shiny';
-$RewriteEngine = on;
-push @RewriteRule, [
-  "^/${VH::shiny_server_path}\$",
-  "/${VH::shiny_server_path}/",
-  '[R]'
-  ];
-$ProxyPreserveHost = "On";
-push @ProxyPassMatch,
-  [
-    "/${VH::shiny_server_path}/(.*)/__sockjs__/(.+)/(websocket|.*/websocket)\$",
-    "ws://localhost:${VH::shiny_server_port}/\$1/__sockjs__/\$2/\$3/"
-  ],
-;
-push @ProxyPass,
-  [
-    "/${VH::shiny_server_path}/",
-    "http://127.0.0.1:${VH::shiny_server_port}/"
-  ],
-;
-# Shiny Server does not include the hostname in the Location header for
-# redirects so we would need to use "ProxyPassReverse /shiny/  /",
-# except the generic '/' path tangles with other proxypasses (redmine
-# #23418). Setting ProxyPassReverse within a Location seems to satisfy
-# everyone.
-$Location{'/shiny/'} = {
-  ProxyPassReverse => "/",
-  ErrorDocument => "502 'Sorry, the server is busy right now. Try again in a few minutes.'"
-};
-
-
-#---------------------------------------------------------------------#
 #         Misc                                                        #
 #---------------------------------------------------------------------#
 $DocumentRoot   = "/var/www/$VH::ServerName/html";
