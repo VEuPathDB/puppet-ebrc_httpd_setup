@@ -34,7 +34,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-dev.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-dev.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-dev.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-dev.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-dev.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-dev.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-dev.local.apidb.org:8443";
@@ -48,7 +47,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-qa.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-qa.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-qa.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-qa.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-qa.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-qa.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-qa.local.apidb.org:8443";
@@ -62,7 +60,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-prod.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-prod.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-prod.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-prod.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-prod.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-prod.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-prod.local.apidb.org:8443";
@@ -76,7 +73,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-feat.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-feat.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-feat.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-feat.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-feat.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-feat.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-feat.local.apidb.org:8443";
@@ -89,7 +85,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-alpha.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-alpha.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-alpha.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-alpha.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-alpha.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-alpha.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-alpha.local.apidb.org:8443";
@@ -102,7 +97,6 @@ sub set_proxy_urls {
       $VH::orthosearch_proxy_url = "https://orthosearch-beta.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-beta.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-beta.local.apidb.org:8443";
-      $VH::das_proxy_url         = "https://das-beta.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-beta.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-beta.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-beta.local.apidb.org:8443";
@@ -219,27 +213,6 @@ sub set_mapveu_proxy {
 
 }
 
-#---------------------------------------------------------------------#
-#        Dataset Access Service (das) proxy                           #
-#---------------------------------------------------------------------#
-
-sub set_das_proxy {
-
-  my $stage = shift;
-  set_proxy_urls($stage);
-
-  $Location{"/dataset-access"} = {
-     ProxyPreserveHost => 'off',
-  };
-
-  push @ProxyPass,
-      [ "/dataset-access ${VH::das_proxy_url}" ],
-  ;
-  push @ProxyPassReverse,
-      [ "/dataset-access ${VH::das_proxy_url}" ],
-  ;
-
-}
 
 #---------------------------------------------------------------------#
 #        Multi-blast Service (mblast) proxy                           #
