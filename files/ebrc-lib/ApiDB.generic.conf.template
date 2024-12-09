@@ -30,7 +30,6 @@
   set_mblast_proxy('dev');
   set_seqret_proxy('dev');
   set_sitesearch_proxy('dev');
-  set_udis_proxy('dev');
   set_vdi_proxy('dev');
   set_jbrowse2_proxy('dev');
 
