@@ -14,7 +14,7 @@ class ebrc_httpd_setup (
     $lib_path = "${::apache::conf_dir}/lib"
   }
 
-  if $facts['os']['family'] != 'redhat' {
+  if $facts['os']['family'] == 'RedHat' {
     fail('OS not supported. Expect an RedHat family.')
   }
 
