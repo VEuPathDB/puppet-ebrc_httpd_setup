@@ -4,7 +4,7 @@
 # https://wiki.apidb.org/index.php/WebsiteReleaseStages
 class ebrc_httpd_setup::website_release_stages {
 
-  if $::osfamily != 'redhat' {
+  if $facts['os']['family'] != 'redhat' {
     fail('OS not supported. Expect an RedHat family.')
   }
 
@@ -21,14 +21,6 @@ class ebrc_httpd_setup::website_release_stages {
     www         => 70,
   }
 
-  # env vars must 'export' in /etc/sysconfig/httpd when using SysVinit
-  # scripts but 'export' is invalid syntax for systemd (rhel >=7)
-  if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
-    $export = ''
-  } else {
-    $export = 'export '
-  }
-
   File_line {
     ensure => present,
     path    => '/etc/sysconfig/httpd',
@@ -37,25 +29,25 @@ class ebrc_httpd_setup::website_release_stages {
   }
 
   file_line { 'WEBSITE_RELEASE_STAGE_DEVELOPMENT':
-    line => "${export}WEBSITE_RELEASE_STAGE_DEVELOPMENT=${stage['development']}",
+    line => "WEBSITE_RELEASE_STAGE_DEVELOPMENT=${stage['development']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_INTEGRATE':
-    line => "${export}WEBSITE_RELEASE_STAGE_INTEGRATE=${stage['integrate']}",
+    line => "WEBSITE_RELEASE_STAGE_INTEGRATE=${stage['integrate']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_FEATURE':
-    line => "${export}WEBSITE_RELEASE_STAGE_FEATURE=${stage['feature']}",
+    line => "WEBSITE_RELEASE_STAGE_FEATURE=${stage['feature']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_ALPHA':
-    line => "${export}WEBSITE_RELEASE_STAGE_ALPHA=${stage['alpha']}",
+    line => "WEBSITE_RELEASE_STAGE_ALPHA=${stage['alpha']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_QA':
-    line => "${export}WEBSITE_RELEASE_STAGE_QA=${stage['qa']}",
+    line => "WEBSITE_RELEASE_STAGE_QA=${stage['qa']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_BETA':
-    line => "${export}WEBSITE_RELEASE_STAGE_BETA=${stage['beta']}",
+    line => "WEBSITE_RELEASE_STAGE_BETA=${stage['beta']}",
   }
   file_line { 'WEBSITE_RELEASE_STAGE_WWW':
-    line => "${export}WEBSITE_RELEASE_STAGE_WWW=${stage['www']}",
+    line => "WEBSITE_RELEASE_STAGE_WWW=${stage['www']}",
   }
 
 
