@@ -32,7 +32,10 @@ class ebrc_httpd_setup::server {
   contain '::apache_ext::mod::jk'
   contain '::apache_ext::mod::line_edit'
   contain '::apache_ext::mod::macro'
-  contain '::apache_ext::mod::proxy_wstunnel' # Shiny Server
+
+  # not deploying shiny server anymore so commenting this out
+  # contain '::apache_ext::mod::proxy_wstunnel' # Shiny Server
+
 
   contain '::apache_ext::php::ldap'
 
