@@ -31,7 +31,9 @@ class ebrc_httpd_setup::server {
   contain '::apache::mod::status'
 
   contain '::apache_ext::mod::jk'
-  contain '::apache_ext::mod::line_edit'
+
+  # TODO disable this for now.
+  # contain '::apache_ext::mod::line_edit'
   contain '::apache_ext::mod::macro'
 
   # not deploying shiny server anymore so commenting this out

@@ -59,13 +59,14 @@ $Location{'/WEB-INF/'} = {
 #                         cmd="/bin/sed s/;jsessionid=/%3Bjsessionid=/g"
 #                        );
 
-push @SetEnv, [[ 'LineEdit' => 'text/html' ]];
-push @LERewriteRule, q(;jsessionid= %3Bjsessionid=);
+# TODO REMOVE THIS WORKAROUND AFTER CONFIRMING THAT IT'S NO LONGER NEEDED
+# push @SetEnv, [[ 'LineEdit' => 'text/html' ]];
+# push @LERewriteRule, q(;jsessionid= %3Bjsessionid=);
 
-$Location{"/$VH::Webapp"} = {
-    #SetOutputFilter => 'encode_semicolon',
-    SetOutputFilter => 'line-editor',
-};
+# $Location{"/$VH::Webapp"} = {
+#     #SetOutputFilter => 'encode_semicolon',
+#     SetOutputFilter => 'line-editor',
+# };
 
 #---------------------------------------------------------------------#
 #          Update @INC (for mod_perl)                                 #

@@ -21,33 +21,12 @@ class ebrc_httpd_setup::website_release_stages {
     www         => 70,
   }
 
-  File_line {
-    ensure => present,
-    path    => '/etc/sysconfig/httpd',
-    require => Package['httpd'],
-    notify  => Class['apache::service'],
-  }
-
-  file_line { 'WEBSITE_RELEASE_STAGE_DEVELOPMENT':
-    line => "WEBSITE_RELEASE_STAGE_DEVELOPMENT=${stage['development']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_INTEGRATE':
-    line => "WEBSITE_RELEASE_STAGE_INTEGRATE=${stage['integrate']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_FEATURE':
-    line => "WEBSITE_RELEASE_STAGE_FEATURE=${stage['feature']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_ALPHA':
-    line => "WEBSITE_RELEASE_STAGE_ALPHA=${stage['alpha']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_QA':
-    line => "WEBSITE_RELEASE_STAGE_QA=${stage['qa']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_BETA':
-    line => "WEBSITE_RELEASE_STAGE_BETA=${stage['beta']}",
-  }
-  file_line { 'WEBSITE_RELEASE_STAGE_WWW':
-    line => "WEBSITE_RELEASE_STAGE_WWW=${stage['www']}",
+  # override the default schedule (daily at midnight) with the setting from hiera
+  systemd::dropin_file { 'website-release-stages.conf':
+    unit           => 'httpd.service',
+    content        => template("ebrc_httpd_setup/website-release-stages.conf.erb"),
+    require        => Package['httpd'],
+    notify_service => true,
   }
 
 
