@@ -53,4 +53,9 @@ class ebrc_httpd_setup (
     content => template('ebrc_httpd_setup/index.html.erb'),
   }
 
+  ## Set SELinux booleans to allow apache to be able to establish connections.
+  ## Without these, things like reverse_proxy & ldap would be blocked.
+  selinux::boolean{ 'httpd_can_network_connect': ensure => 'on', }
+  selinux::boolean{ 'httpd_can_connect_ldap': ensure => 'on', }
+
 }
