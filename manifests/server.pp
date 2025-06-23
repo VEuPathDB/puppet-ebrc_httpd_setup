@@ -19,12 +19,9 @@ class ebrc_httpd_setup::server {
   contain '::apache::mod::authnz_ldap'
   contain '::apache::mod::headers'
   contain '::apache::mod::perl'
-  # TODO add these back once we figure php out
-  # contain '::apache::mod::php'
+  contain '::apache::mod::proxy'
   contain '::apache::mod::proxy_html'
   contain '::apache::mod::proxy_http'
-  contain '::apache::mod::proxy'
-  contain '::apache::mod::proxy'
   contain '::apache::mod::remoteip'
   contain '::apache::mod::ssl'
   contain '::apache::mod::fcgid'
@@ -39,8 +36,9 @@ class ebrc_httpd_setup::server {
   # not deploying shiny server anymore so commenting this out
   # contain '::apache_ext::mod::proxy_wstunnel' # Shiny Server
 
-  # TODO add these back once we figure php out
-  # contain '::apache_ext::php::ldap'
+  contain '::apache::mod::proxy_fcgi' # this is required for php-fpm
+  contain '::apache_ext::php_fpm'
+  contain '::apache_ext::php::ldap'
 
   contain '::mod_auth_tkt'
 
