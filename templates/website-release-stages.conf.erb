@@ -3,10 +3,4 @@
 ################################################################################
 
 [Service]
-Environment=WEBSITE_RELEASE_STAGE_DEVELOPMENT=<%= @stage['development'] %>
-Environment=WEBSITE_RELEASE_STAGE_INTEGRATE=<%= @stage['integrate'] %>
-Environment=WEBSITE_RELEASE_STAGE_FEATURE=<%= @stage['feature'] %>
-Environment=WEBSITE_RELEASE_STAGE_ALPHA=<%= @stage['alpha'] %>
-Environment=WEBSITE_RELEASE_STAGE_QA=<%= @stage['qa'] %>
-Environment=WEBSITE_RELEASE_STAGE_BETA=<%= @stage['beta'] %>
-Environment=WEBSITE_RELEASE_STAGE_WWW=<%= @stage['www'] %>
+EnvironmentFile=/etc/sysconfig/httpd

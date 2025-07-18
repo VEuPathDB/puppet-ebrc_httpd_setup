@@ -21,6 +21,14 @@ class ebrc_httpd_setup::website_release_stages {
     www         => 70,
   }
 
+  file { "/etc/sysconfig/httpd":
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => template("ebrc_httpd_setup/website-release-stages.env.erb"),
+  }
+
   # override the default schedule (daily at midnight) with the setting from hiera
   systemd::dropin_file { 'website-release-stages.conf':
     unit           => 'httpd.service',
