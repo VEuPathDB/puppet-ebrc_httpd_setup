@@ -4,7 +4,7 @@ class ebrc_httpd_setup::config (
   $lib_dir            = '/etc/httpd/conf/lib',
   $enable_sites_dir   = '/etc/httpd/conf/enabled_sites',
   $disabled_sites_dir = '/etc/httpd/conf/disabled_sites',
-  $compiled_dir       = '/etc/httpd/conf/compiled',
+  $compiled_dir       = '/var/cache/httpd/conf_compiled',
 ) {
 
   $manage_enabled_sites = lookup ({
@@ -25,6 +25,12 @@ class ebrc_httpd_setup::config (
   ]:
     ensure => directory,
     mode   => '0755',
+  }
+
+  # Add a symlink to the old path to make it easier to find
+  file {'/etc/httpd/conf/compiled':
+    ensure => link,
+    target => $compiled_dir,
   }
 
   if($manage_enabled_sites) {
