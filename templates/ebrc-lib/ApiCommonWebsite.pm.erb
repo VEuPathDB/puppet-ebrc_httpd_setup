@@ -94,7 +94,6 @@ if (Apache2::Module::loaded('mod_fcgid.c')) {
     "ORACLE_HOME     <%= scope.lookupvar('ebrc_httpd_setup::oracle_home') %>",
     "LD_LIBRARY_PATH <%= scope.lookupvar('ebrc_httpd_setup::oracle_home') %>/lib",
     "PERL5LIB        /var/www/$VH::ServerName/cgi-lib:/var/www/$VH::ServerName/gus_home/lib/perl",
-    "GBROWSE_CONF    /var/www/$VH::ServerName/gus_home/lib/gbrowse/",
     "GUS_HOME        /var/www/$VH::ServerName/gus_home",
     "PROJECT_ID      $VH::Site",
   ;

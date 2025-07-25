@@ -63,19 +63,11 @@ class ebrc_httpd_setup::config (
 
   ebrc_httpd_setup::libfile { 'ApiDB.generic.conf.template': }
   ebrc_httpd_setup::libfile { 'ApiDB.generic.static.conf.template': }
-  ebrc_httpd_setup::libfile { 'ApiDB.pm': }
   ebrc_httpd_setup::libfile { 'ApiStaticWebsite.pm': }
   ebrc_httpd_setup::libfile { 'Containers.pm': }
-  ebrc_httpd_setup::libfile { 'CryptoDB.pm': }
   ebrc_httpd_setup::libfile { 'DashboardStaticAuth.conf': }
   ebrc_httpd_setup::libfile { 'DirectoryFileDescriptions.conf': }
-  ebrc_httpd_setup::libfile { 'DownloadDir.conf': }
-  ebrc_httpd_setup::libfile { 'Dumpost.pm': }
-  ebrc_httpd_setup::libfile { 'EuPathDB.pm': }
-  ebrc_httpd_setup::libfile { 'Gbrowse.pm': }
-  ebrc_httpd_setup::libfile { 'GbrowsePreload.pm': }
   ebrc_httpd_setup::libfile { 'MimeTypes.conf': }
-  ebrc_httpd_setup::libfile { 'OrthoMCL.pm': }
   ebrc_httpd_setup::libfile { 'Postscript.pm': }
   ebrc_httpd_setup::libfile { 'Publish.pm': }
   ebrc_httpd_setup::libfile { 'ReleaseCheck.pm': }
