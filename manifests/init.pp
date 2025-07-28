@@ -53,9 +53,25 @@ class ebrc_httpd_setup (
     content => template('ebrc_httpd_setup/index.html.erb'),
   }
 
-  ## Set SELinux booleans to allow apache to be able to establish connections.
-  ## Without these, things like reverse_proxy & ldap would be blocked.
+  # Set SELinux boolean to allow apache to be able to establish connections.
+  # Without this reverse_proxy (and potentially other things in cgi-bin) would fail
   selinux::boolean{ 'httpd_can_network_connect': ensure => 'on', }
+
+  # Without this, ldap would be blocked.
   selinux::boolean{ 'httpd_can_connect_ldap': ensure => 'on', }
+
+  # Allow HTTPD to set resource limits. We need this for some of our CGI scripts to run
+  # as we try to set resource limits on the CGI tool calls
+  selinux::boolean{ 'httpd_setrlimit': ensure => 'on', }
+
+  # Additional SELinux policies to make sure our cgi scripts work properly
+  selinux::module{ 'veupathdb_httpd module':
+    ensure    => 'present',
+    source_te => 'puppet:///profiles/selinux/veupathdb_httpd.te',
+    builder   => 'simple'
+  }
+
+
+
 
 }
