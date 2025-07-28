@@ -65,9 +65,9 @@ class ebrc_httpd_setup (
   selinux::boolean{ 'httpd_setrlimit': ensure => 'on', }
 
   # Additional SELinux policies to make sure our cgi scripts work properly
-  selinux::module{ 'veupathdb_httpd module':
+  selinux::module{ 'veupathdb_httpd':
     ensure    => 'present',
-    source_te => 'puppet:///profiles/selinux/veupathdb_httpd.te',
+    source_te => 'puppet:///modules/profiles/selinux/veupathdb_httpd.te',
     builder   => 'simple'
   }
 
