@@ -18,6 +18,28 @@ class ebrc_httpd_setup (
     fail('OS not supported. Expect a RedHat family.')
   }
 
+  $default_cert_command = @(END)
+  #!/usr/bin/bash
+  set -e
+
+  FQDN=`hostname`
+
+  sscg -q                                                             \
+    --cert-file           /etc/pki/tls/certs/localhost.crt         \
+    --cert-key-file       /etc/pki/tls/private/localhost.key       \
+    --ca-file             /etc/pki/tls/certs/localhost.crt         \
+    --dhparams-file       /tmp/dhparams.pem                        \
+    --lifetime            365                                      \
+    --hostname            $FQDN                                    \
+    --email               root@$FQDN
+  | END
+
+  exec { "create-default-httpd-certs":
+    command => $default_cert_command,
+    creates => "/etc/pki/tls/certs/localhost.crt",
+    require => Class['::apache::mod::ssl'],
+  }
+
   contain '::ebrc_httpd_setup::server'
   contain '::ebrc_httpd_setup::config'
 
