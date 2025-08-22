@@ -176,3 +176,17 @@ ErrorDocument 506 /error/HTTP_VARIANT_ALSO_VARIES.html.var
   ErrorLog "/var/log/httpd/ssl_error_log"
   CustomLog "/var/log/httpd/ssl_access_log" combined
 </VirtualHost>
+
+<%- if $conf_enabled { -%>
+IncludeOptional "<%= $conf_enabled %>/*.conf"
+<%- } -%>
+IncludeOptional "<%= $confd_dir %>/*.conf"
+<% if $vhost_load_dir != $confd_dir { -%>
+IncludeOptional "<%= $vhost_load_dir %>/<%= $vhost_include_pattern %>"
+<% } -%>
+<% if $ldap_verify_server_cert { -%>
+LDAPVerifyServerCert <%= $ldap_verify_server_cert %>
+<% } -%>
+<% if $ldap_trusted_mode { -%>
+LDAPTrustedMode <%= $ldap_trusted_mode %>
+<% } -%>
