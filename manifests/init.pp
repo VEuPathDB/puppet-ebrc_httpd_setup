@@ -52,18 +52,15 @@ class ebrc_httpd_setup (
     group  => $::apache::group,
   }
 
-  file { '/etc/httpd/conf.d/ebrc-dashboard.conf':
-    mode    => '0600', # contains secrets!
-    owner   => 'root',
-    content => template('ebrc_httpd_setup/ebrc-dashboard.conf.erb'),
-    notify  => Service['httpd'],
+  apache::custom_config { 'ebrc-dashboard':
+    priority  => false,
+    content   => template('ebrc_httpd_setup/ebrc-dashboard.conf.erb'),
+    file_mode => '0600', # contains secrets!
   }
 
-  file { '/etc/httpd/conf.d/oracle.conf':
-    mode    => '0644',
-    owner   => 'root',
+  apache::custom_config { 'oracle':
+    priority => false,
     content => template('ebrc_httpd_setup/oracle.conf.erb'),
-    notify  => Service['httpd'],
   }
 
   file { "${::apache::docroot}/index.html":
