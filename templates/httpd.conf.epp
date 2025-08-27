@@ -100,20 +100,6 @@ LogFormat "<%= $values[1] -%>" <%= $values[0] %>
   <%- } -%>
 <% } -%>
 
-<%- if $conf_enabled { -%>
-IncludeOptional "<%= $conf_enabled %>/*.conf"
-<%- } -%>
-IncludeOptional "<%= $confd_dir %>/*.conf"
-<% if $vhost_load_dir != $confd_dir { -%>
-IncludeOptional "<%= $vhost_load_dir %>/<%= $vhost_include_pattern %>"
-<% } -%>
-<% if $ldap_verify_server_cert { -%>
-LDAPVerifyServerCert <%= $ldap_verify_server_cert %>
-<% } -%>
-<% if $ldap_trusted_mode { -%>
-LDAPTrustedMode <%= $ldap_trusted_mode %>
-<% } -%>
-
 <% if $error_documents { -%>
 # /usr/share/apache2/error on debian
 Alias /error/ "<%=$error_documents_path %>/"
