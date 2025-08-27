@@ -165,9 +165,9 @@ ErrorDocument 506 /error/HTTP_VARIANT_ALSO_VARIES.html.var
   ServerAdmin root@localhost
   ServerSignature Off
   SSLEngine on
-  SSLCertificateFile    "/etc/pki/tls/certs/localhost.crt"
-  SSLCertificateKeyFile "/etc/pki/tls/private/localhost.key"
-  SSLCACertificatePath  "/etc/pki/tls/certs"
+  SSLCertificateFile /etc/acme/apidb.org/cert.pem
+  SSLCertificateKeyFile /etc/acme/apidb.org/cert.key
+  SSLCACertificatePath /etc/acme/apidb.org/
   DocumentRoot "/var/www/html"
   <Directory "/var/www/html">
     AllowOverride None
