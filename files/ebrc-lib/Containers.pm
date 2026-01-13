@@ -98,6 +98,7 @@ sub set_proxy_urls {
       $VH::edasearch_proxy_url   = "https://edasearch-beta.local.apidb.org:8443";
       $VH::mapveu_proxy_url      = "https://mapveu-beta.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-beta.local.apidb.org:8443";
+      $VH::cellxgene_proxy_url   = "https://cellxgene-beta.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-beta.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-beta.local.apidb.org:8443";
       $VH::vdi_proxy_url         = "https://vdi-beta.local.apidb.org:8443";
