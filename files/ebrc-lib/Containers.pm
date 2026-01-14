@@ -33,7 +33,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-dev.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-dev.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-dev.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-dev.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-dev.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-dev.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-dev.local.apidb.org:8443";
@@ -46,7 +45,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-qa.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-qa.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-qa.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-qa.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-qa.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-qa.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-qa.local.apidb.org:8443";
@@ -59,7 +57,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-prod.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-prod.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-prod.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-prod.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-prod.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-prod.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-prod.local.apidb.org:8443";
@@ -72,7 +69,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-feat.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-feat.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-feat.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-feat.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-feat.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-feat.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-feat.local.apidb.org:8443";
@@ -84,7 +80,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-alpha.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-alpha.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-alpha.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-alpha.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-alpha.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-alpha.local.apidb.org:8443";
       $VH::seqret_proxy_url      = "https://sequenceretrieval-alpha.local.apidb.org:8443";
@@ -96,7 +91,6 @@ sub set_proxy_urls {
       $VH::site_search_proxy_url = "https://sitesearch-beta.local.apidb.org:8443";
       $VH::orthosearch_proxy_url = "https://orthosearch-beta.local.apidb.org:8443";
       $VH::edasearch_proxy_url   = "https://edasearch-beta.local.apidb.org:8443";
-      $VH::mapveu_proxy_url      = "https://mapveu-beta.local.apidb.org:8443";
       $VH::mblast_proxy_url      = "https://mblast-beta.local.apidb.org:8443";
       $VH::cellxgene_proxy_url   = "https://cellxgene-beta.local.apidb.org:8443";
       $VH::eda_proxy_url         = "https://edadata-beta.local.apidb.org:8443";
@@ -170,50 +164,6 @@ sub set_sitesearch_proxy {
   ;
 
 }
-
-#---------------------------------------------------------------------#
-#        MapVEu proxy                                                 #
-#---------------------------------------------------------------------#
-  
-sub set_mapveu_proxy {
-
-  my $stage = shift;
-  set_proxy_urls($stage);
-
-  $Location{"/popbio-map"} = {
-     ProxyPreserveHost => 'off',
-  };
-
-  # if there is a directory named 'popbio-map' in html, we assume this vhost is
-  # being used to develop the map, and only proxy the solr backends 
-
-  if (-d '/var/www/'.$VH::ServerName.'/html/popbio-map') {
-    push @ProxyPass,
-        [ "/popbio-map/web/esolr ${VH::mapveu_proxy_url}/web/esolr" ],
-    ;
-    push @ProxyPassReverse,
-        [ "/popbio-map/web/esolr ${VH::mapveu_proxy_url}/web/esolr" ],
-    ;
-    push @ProxyPass,
-        [ "/popbio-map/web/asolr ${VH::mapveu_proxy_url}/web/asolr" ],
-    ;
-    push @ProxyPassReverse,
-        [ "/popbio-map/web/asolr ${VH::mapveu_proxy_url}/web/asolr" ],
-    ;
-  }
-  # otherwise, proxy the whole thing
-  else {
-    push @ProxyPass,
-        [ "/popbio-map ${VH::mapveu_proxy_url}" ],
-    ;
-    push @ProxyPassReverse,
-        [ "/popbio-map ${VH::mapveu_proxy_url}" ],
-    ;
-  }
-
-
-}
-
 
 #---------------------------------------------------------------------#
 #        Multi-blast Service (mblast) proxy                           #
