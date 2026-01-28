@@ -80,6 +80,10 @@ class ebrc_httpd_setup (
   # as we try to set resource limits on the CGI tool calls
   selinux::boolean{ 'httpd_setrlimit': ensure => 'on', }
 
+  # without this apache can't serve/access files from our nfs mounts
+  # this only affects node that mount webservices & apisitefiles from nfs
+  selinux::boolean{ 'httpd_use_nfs': ensure => 'on', }
+
   # Additional SELinux policies to make sure our cgi scripts work properly
   selinux::module{ 'veupathdb_httpd':
     ensure    => 'present',
