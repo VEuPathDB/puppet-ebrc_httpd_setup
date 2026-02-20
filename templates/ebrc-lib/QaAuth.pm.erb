@@ -59,23 +59,24 @@ $VH::QaAuth = qq{
     TKTAuthDebug 1
     TKTAuthToken 'apidb'
 
-    SetEnvIfExpr "%{REMOTE_ADDR} in { '172.16.30.88', '128.192.75.15', '128.192.75.73', '128.192.21.13' }" is_proxied
+    SetEnvIfExpr "%{REMOTE_ADDR} in { '128.192.21.13' }" is_proxied
 
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.107'"   proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.109'"   proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.108'"   proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.16'"   proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.96'"   proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.211'"  proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.75.253'"  proxied_internal_client
-
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.19'"  proxied_internal_client
-    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.22'"  proxied_internal_client
+    # uga servers
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.15'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.16'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.19'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.20'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.21'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.22'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.192.21.63'"  proxied_internal_client
+
+    # penn servers
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.51'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.52'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.53'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.54'"  proxied_internal_client
     SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.55'"  proxied_internal_client
+    SetEnvIfExpr "%{ENV:is_proxied} == '1' && %{HTTP:X-Real-IP} == '128.91.204.56'"  proxied_internal_client
 
     SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch  '127.0.0.0/8'"     localhost
 
@@ -94,29 +95,34 @@ $VH::QaAuth = qq{
 <%- end -%>
 
     # internal clients not going through Nginx
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.107'"   internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.109'"   internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.108'"   internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.16'"   internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.96'"   internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.211'"  internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.75.253'"  internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.63'"  internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.19'"  internal_client
-    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.22'"  internal_client
+
+    #uga servers
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.15'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.16'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.19'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.20'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.21'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.22'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.192.21.63'"  internal_client
+
+    # penn servers
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.51'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.52'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.53'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.54'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.55'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '128.91.204.56'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.201'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.202'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.203'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.204'"  internal_client
     SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.205'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} == '172.16.44.206'"  internal_client
 
-    # requests made from local docker containers come from our internal docker
+    # requests made from local containers come from our internal container
     # network and need to be allowed through
-    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch '10.70.0.0/19'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch '10.88.0.0/16'"  internal_client
+    SetEnvIfExpr "%{REMOTE_ADDR} -ipmatch '10.89.0.0/16'"  internal_client
 
     # on new hardware at Penn (i.e. fir) this comes through the gateway for
     # internal requests to public natted addresses
