@@ -28,6 +28,7 @@ class ebrc_httpd_setup::server {
   contain '::apache::mod::status'
 
   contain '::apache_ext::mod::jk'
+  contain '::apache_ext::mod::brotli'
 
   # TODO disable this for now.
   # contain '::apache_ext::mod::line_edit'
