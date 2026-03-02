@@ -117,7 +117,7 @@ push @ErrorDocument,
                      "503 /500.shtml",
 ;
 
-# Sequence Retreival Tool (contigSrt) is known to need lots of time.
+# Sequence Retrieval Tool (contigSrt) is known to need lots of time.
 # Keep the hard limit higher than soft limit, otherwise processes get SIGKILL'd
 # instead of a trappable SIGXCPU.
 $RLimitCPU = "43200 46800";
@@ -420,6 +420,19 @@ push @CustomLog, [
 #        q(env=self)
 #    ],
 ];
+
+#---------------------------------------------------------------------#
+#          Compression                                                #
+#---------------------------------------------------------------------#
+
+# Enable brotli compression unless we are behind the proxy. If we are behind proxy,
+# don't waste CPU on compression and let the proxy handle compression.
+#
+push @AddOutputFilterByType, [
+  "BROTLI_COMPRESS",
+  "text/html text/plain text/xml text/css text/javascript application/javascript application/json"
+] unless $ENV{'is_proxied'};
+
 
 #---------------------------------------------------------------------#
 #          SSLEngine                                                  #
