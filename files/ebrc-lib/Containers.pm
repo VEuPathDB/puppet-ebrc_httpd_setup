@@ -99,6 +99,12 @@ sub set_proxy_urls {
       $VH::jbrowse2_proxy_url    = "https://jbrowse2-beta.local.apidb.org:8443";
   }
 
+  if ($stage eq "load") {
+    $VH::site_search_proxy_url = "https://sitesearch-load.local.apidb.org:8443";
+    $VH::orthosearch_proxy_url = "https://orthosearch-load.local.apidb.org:8443";
+    $VH::edasearch_proxy_url   = "https://edasearch-load.local.apidb.org:8443";
+  }
+
 #---------------------------------------------------------------------#
 #        set for all proxies                                          #
 #---------------------------------------------------------------------#
