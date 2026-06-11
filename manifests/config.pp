@@ -78,6 +78,9 @@ class ebrc_httpd_setup::config (
   ebrc_httpd_setup::libtmpl { 'QaAuth.pm': }
   ebrc_httpd_setup::libtmpl { 'ApiCommonWebsite.pm': }
 
+  # Project specific configs
+  ebrc_httpd_setup::libfile { 'ClinEpiDB.pm': }
+
   ########################################################################
   # End PerlSection Perl modules, ToBe moved into an RPM?
   ########################################################################
