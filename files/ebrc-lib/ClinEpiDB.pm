@@ -8,7 +8,7 @@
 push @RewriteRule, ['^/analysis/(.{7})', "/$VH::Webapp/app/workspace/analyses/\$1/import", '[R,L]'];
 
 # https://epvb.slack.com/archives/CBDP82CSU/p1780927079724089
-push @RewriteRule, ["^/$VH::Webapp/app/record/userdataset/(EDAUD_[^/]+)$", "/$VH::Webapp/app/workspace/analyses/\$1/new/details", '[R=302,L]'];
+push @RewriteRule, ["^/$VH::Webapp/app/record/userdataset/(EDAUD_[^/]+)\$", "/$VH::Webapp/app/workspace/analyses/\$1/new/details", '[R=302,L]'];
 
 
 1;
