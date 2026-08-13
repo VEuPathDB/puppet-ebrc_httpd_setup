@@ -88,6 +88,7 @@ class ebrc_httpd_setup (
   selinux::module{ 'veupathdb_httpd':
     ensure    => 'present',
     source_te => 'puppet:///modules/profiles/selinux/veupathdb_httpd.te',
+    source_fc => 'puppet:///modules/profiles/selinux/veupathdb_httpd.fc',
     builder   => 'refpolicy'
   }
 
