@@ -254,27 +254,27 @@ if (Apache2::Module::loaded('mod_fcgid.c')) {
 #---------------------------------------------------------------------#
 #      /common/downloads (allow Indexes) - define before /common      #
 #---------------------------------------------------------------------#
-push @Alias,
-    ['/common/downloads' => "/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"],
-;
-$Directory{"/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"} = {
-    Options => [qw( Indexes FollowSymLinks Includes MultiViews )],
-    IndexOptions => [qw(
-        SuppressHTMLPreamble
-        FancyIndexing
-        FoldersFirst
-        IgnoreCase
-        DescriptionWidth=*
-     )],
-     ReadmeName => '/include/fancyIndexFooter.shtml',
-     HeaderName => '/include/fancyIndexHeader.shtml',
-
-     Include => [ qw(conf/lib/DirectoryFileDescriptions.conf) ],
-     IndexIgnore   => [qw(.??* *~ *# )],
-     AllowOverride => 'Indexes',
-     Require       => 'all granted',
-     AddType       => 'application/octet-stream .txt',
-};
+# push @Alias,
+#     ['/common/downloads' => "/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"],
+# ;
+# $Directory{"/var/www/Common/apiSiteFilesMirror/downloadSite/$VH::Site"} = {
+#     Options => [qw( Indexes FollowSymLinks Includes MultiViews )],
+#     IndexOptions => [qw(
+#         SuppressHTMLPreamble
+#         FancyIndexing
+#         FoldersFirst
+#         IgnoreCase
+#         DescriptionWidth=*
+#      )],
+#      ReadmeName => '/include/fancyIndexFooter.shtml',
+#      HeaderName => '/include/fancyIndexHeader.shtml',
+#
+#      Include => [ qw(conf/lib/DirectoryFileDescriptions.conf) ],
+#      IndexIgnore   => [qw(.??* *~ *# )],
+#      AllowOverride => 'Indexes',
+#      Require       => 'all granted',
+#      AddType       => 'application/octet-stream .txt',
+# };
 
 #---------------------------------------------------------------------#
 #      /common/community                 - define before /common      #
@@ -292,29 +292,29 @@ $Directory{"/var/www/Common/communityFilesMirror"} = {
 #---------------------------------------------------------------------#
 #          /common                                                    #
 #---------------------------------------------------------------------#
-push @Alias,
-    ['/common' => "/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"],
-;
-$Directory{"/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"} = {
-    AllowOverride   => 'None',
-    Options         => [qw(FollowSymLinks Includes)],
-    Require         => 'all granted',
-};
+# push @Alias,
+#     ['/common' => "/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"],
+# ;
+# $Directory{"/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"} = {
+#     AllowOverride   => 'None',
+#     Options         => [qw(FollowSymLinks Includes)],
+#     Require         => 'all granted',
+# };
 
 
 #---------------------------------------------------------------------#
 #          /common/cgi-bin                                            #
 #---------------------------------------------------------------------#
-push @ScriptAlias,
-    ['/common-bin' => "/var/www/$VH::Site/Common/cgi-bin"],
-;
-$Directory{"/var/www/$VH::Site/Common/cgi-bin"} = {
-    SetEnv          => [qw(LANG en_US.UTF-8)],
-    AllowOverride   => 'None',
-    Options         => [qw(ExecCGI Includes)],
-    SetOutputFilter => 'Includes',
-    Require         => 'all granted',
-};
+# push @ScriptAlias,
+#     ['/common-bin' => "/var/www/$VH::Site/Common/cgi-bin"],
+# ;
+# $Directory{"/var/www/$VH::Site/Common/cgi-bin"} = {
+#     SetEnv          => [qw(LANG en_US.UTF-8)],
+#     AllowOverride   => 'None',
+#     Options         => [qw(ExecCGI Includes)],
+#     SetOutputFilter => 'Includes',
+#     Require         => 'all granted',
+# };
 
 
 #---------------------------------------------------------------------#
