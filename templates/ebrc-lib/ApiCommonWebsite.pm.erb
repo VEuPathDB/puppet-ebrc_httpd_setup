@@ -47,28 +47,6 @@ $Location{'/WEB-INF/'} = {
 
 
 #---------------------------------------------------------------------#
-#          SAFARI SEMICOLON/AUTH WORKAROUND                           #
-#---------------------------------------------------------------------#
-# Safari does not send Authorization header for request URIs that contain
-# a semicolon - such as Struts <c:url> modified urls that contain
-# ;jsessionid. Encoding ';' as '%3B' works around this.
-## should investigate using the lower overhead mod_line_edit instead
-#push @ExtFilterDefine, q(encode_semicolon
-#                         mode=output
-#                         intype=text/html
-#                         cmd="/bin/sed s/;jsessionid=/%3Bjsessionid=/g"
-#                        );
-
-# TODO REMOVE THIS WORKAROUND AFTER CONFIRMING THAT IT'S NO LONGER NEEDED
-# push @SetEnv, [[ 'LineEdit' => 'text/html' ]];
-# push @LERewriteRule, q(;jsessionid= %3Bjsessionid=);
-
-# $Location{"/$VH::Webapp"} = {
-#     #SetOutputFilter => 'encode_semicolon',
-#     SetOutputFilter => 'line-editor',
-# };
-
-#---------------------------------------------------------------------#
 #          Update @INC (for mod_perl)                                 #
 #---------------------------------------------------------------------#
 use lib "$SVR::server_root/conf/lib";
@@ -169,8 +147,6 @@ if ($s->port() == '443') {
 @JkMount = (
     [ "/$VH::Webapp/*" => "$VH::Site" ],
     [ "/$VH::Webapp"   => "$VH::Site" ],
-    [ "/axis/*"        => "$VH::Site" ],
-    [ "/axis"          => "$VH::Site" ],
 );
 
 push @JkEnvVar, qw(SERVER_ADDR HTTP_ACCEPT_ENCODING);
@@ -342,21 +318,6 @@ $Directory{"/var/www/$VH::Site/Common/cgi-bin"} = {
 
 
 #---------------------------------------------------------------------#
-#           RSS feeds                                                 #
-#---------------------------------------------------------------------#
-push @RewriteRule,
-    [ '/news.rss'              ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.NewsRss"         ,    '[PT]'   ],
-    [ '/events.rss'            ,    "/$VH::Webapp/communityEventsRss.jsp"                                  ,    '[PT]'   ],
-    [ '/ebrcpresentations.rss'            ,    "/$VH::Webapp/presentationsRss.jsp"                                  ,    '[PT]'   ],
-    [ '/publications.rss'      ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss" ,    '[PT]'   ],
-    [ '/releases.rss'          ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.ReleasesRss"     ,    '[PT]'   ],
-    [ '/ebrcnews.rss'          ,    "/$VH::Webapp/aggregateNewsRss.jsp"                    ,    '[PT]'   ],
-    [ '/ebrcevents.rss'        ,    "/$VH::Webapp/communityEventsRss.jsp"                  ,    '[PT]'   ],
-    [ '/ebrcpublications.rss'  ,    "/$VH::Webapp/showXmlDataContent.do?name=XmlQuestions.PublicationsRss",    '[PT]'   ],
-    [ '/ebrcreleases.rss'      ,    "/$VH::Webapp/aggregateReleasesRss.jsp"                ,    '[PT]'   ],
-;
-
-#---------------------------------------------------------------------#
 #          /news redirect                                             #
 #---------------------------------------------------------------------#
 push @RewriteRule,
@@ -391,13 +352,9 @@ $ErrorLog = "/var/log/httpd/$VH::ServerName/error_log";
 
 my $log_dir = "/var/log/httpd/$VH::ServerName";
 
-# Set LogFormat string to use if mod_log_firstbyte is installed.
-# (http://code.google.com/p/mod-log-firstbyte/)
-my $mod_log_firstbyte = (-e '/etc/httpd/modules/mod_log_firstbyte.so') ? ' %F' : '';
-
 push @LogFormat, [
-  [  # combined format plus Response Time, plus mod_first_byte time if module is installed
-     qq(\"%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\" %D${mod_log_firstbyte}\"),
+  [  # combined format plus Response Time
+     qq(\"%a %l %u %t \\"%r\\" %>s %b \\"%{Referer}i\\" \\"%{User-Agent}i\\" %D\"),
      q(combined+rt)
   ],
 ];
