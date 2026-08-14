@@ -80,6 +80,7 @@ class ebrc_httpd_setup::config (
 
   # Project specific configs
   ebrc_httpd_setup::libfile { 'ClinEpiDB.pm': }
+  ebrc_httpd_setup::libfile { 'OrthoMCL.pm': }
 
   ########################################################################
   # End PerlSection Perl modules, ToBe moved into an RPM?
