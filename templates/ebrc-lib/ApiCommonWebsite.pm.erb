@@ -114,8 +114,8 @@ push @RewriteRule,
     # redmine #21743
     [ '^/gene/([^\/]+)$', "/$VH::Webapp/app/record/gene/\$1", '[R,L]' ],
     # redmine #22499
-    [ '^/(gene|genome)/([^\/]+)/comment/([^\/]+)$', "/$VH::Webapp/showComment.do?stableId=\$2&commentTargetId=\$1#\$3", '[R,NE,L]' ],
-    [ '^/dataset/(.+)', "/$VH::Webapp/app/search/dataset/DatasetsById/result?dataset_id=\$1", '[R,L]' ],
+    [ '^/(gene|genome)/([^\/]+)/comment/([^\/]+)$', "/$VH::Webapp/app/user-comments/show?stableId=\$2&commentTargetId=\$1#\$3", '[R,NE,L]' ],
+    [ '^/dataset/(.+)', "/$VH::Webapp/app/record/dataset/\$1", '[R,L]' ],
 ;
 
 # provide uniformly named access to static files (js, css, etc) served by Tomcat
