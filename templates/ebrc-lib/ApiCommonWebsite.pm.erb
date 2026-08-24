@@ -292,14 +292,14 @@ $Directory{"/var/www/Common/communityFilesMirror"} = {
 #---------------------------------------------------------------------#
 #          /common                                                    #
 #---------------------------------------------------------------------#
-# push @Alias,
-#     ['/common' => "/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"],
-# ;
-# $Directory{"/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"} = {
-#     AllowOverride   => 'None',
-#     Options         => [qw(FollowSymLinks Includes)],
-#     Require         => 'all granted',
-# };
+push @Alias,
+    ['/common' => "/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"],
+;
+$Directory{"/var/www/Common/apiSiteFilesMirror/auxiliary/$VH::Site"} = {
+    AllowOverride   => 'None',
+    Options         => [qw(FollowSymLinks Includes)],
+    Require         => 'all granted',
+};
 
 
 #---------------------------------------------------------------------#
