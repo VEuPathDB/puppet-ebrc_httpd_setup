@@ -30,7 +30,7 @@
   set_seqret_proxy('dev');
   set_sitesearch_proxy('dev');
   set_vdi_proxy('dev');
-  set_jbrowse2_proxy('dev');
+  set_pathfinder_proxy('dev');
 
   </Perl>
 
