@@ -39,6 +39,7 @@ sub set_proxy_urls {
       $VH::seqret_proxy_url      = "https://sequenceretrieval-dev.local.apidb.org:8443";
       $VH::vdi_proxy_url         = "https://vdi-dev.local.apidb.org:8443";
       $VH::jbrowse2_proxy_url    = "https://jbrowse2-dev.local.apidb.org:8443";
+      $VH::pathfinder_proxy_url    = "https://pathfinder-dev.local.apidb.org:8443/pathfinder";
   }
 
   if ($stage eq "qa") {
@@ -51,6 +52,7 @@ sub set_proxy_urls {
       $VH::seqret_proxy_url      = "https://sequenceretrieval-qa.local.apidb.org:8443";
       $VH::vdi_proxy_url         = "https://vdi-qa.local.apidb.org:8443";
       $VH::jbrowse2_proxy_url    = "https://jbrowse2-qa.local.apidb.org:8443";
+      $VH::pathfinder_proxy_url  = "https://pathfinder-qa.local.apidb.org:8443/pathfinder";
   }
 
   if ($stage eq "prod") {
@@ -63,6 +65,7 @@ sub set_proxy_urls {
       $VH::seqret_proxy_url      = "https://sequenceretrieval-prod.local.apidb.org:8443";
       $VH::vdi_proxy_url         = "https://vdi-prod.local.apidb.org:8443";
       $VH::jbrowse2_proxy_url    = "https://jbrowse2-prod.local.apidb.org:8443";
+      $VH::pathfinder_proxy_url  = "https://pathfinder-prod.local.apidb.org:8443/pathfinder";
   }
 
   if ($stage eq "feat") {
@@ -302,6 +305,24 @@ sub set_jbrowse2_proxy {
     push @ProxyPassReverse,
         [ "/jbrowse2 ${VH::jbrowse2_proxy_url}" ],
     ;
+
+}
+
+sub set_pathfinder_proxy {
+
+  my $stage = shift;
+  set_proxy_urls($stage);
+
+  $Location{"/pathfinder"} = {
+    ProxyPreserveHost => 'off',
+  };
+
+  push @ProxyPass,
+    [ "/pathfinder ${VH::jbrowse2_proxy_url} flushpackets=on" ],
+  ;
+  push @ProxyPassReverse,
+    [ "/pathfinder ${VH::jbrowse2_proxy_url}" ],
+  ;
 
 }
 
