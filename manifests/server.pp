@@ -26,6 +26,7 @@ class ebrc_httpd_setup::server {
   contain '::apache::mod::ssl'
   contain '::apache::mod::fcgid'
   contain '::apache::mod::status'
+  contain '::apache::mod::reqtimeout'
 
   contain '::apache_ext::mod::jk'
   contain '::apache_ext::mod::brotli'
